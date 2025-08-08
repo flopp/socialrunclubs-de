@@ -1,2 +1,2 @@
 # socialrunclubs-de
-A directory of "Social Run Clubs" in Germany
+A directory of "Social Run Clubs" in Germany https://socialrunclubs.de

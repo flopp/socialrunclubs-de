@@ -1,8 +1,13 @@
+
+
+SERVER = echeclus.uberspace.de
+TARGET_DIR = packages/socialrunclubs.de
+
 all:
 	@echo "make sync       -> build and upload to socialrunclubs.de"
 	@echo "make run-remote -> sync & run remote script"
 
-.bin/generate-linux: cmd/generate/main.go go.mod
+ .bin/generate-linux: cmd/generate/main.go go.mod
 	mkdir -p .bin
 	GOOS=linux GOARCH=amd64 go build -o .bin/generate-linux cmd/generate/main.go
 
@@ -17,10 +22,10 @@ build:
 .phony: sync
 sync: .repo/.git/config .bin/generate-linux
 	(cd .repo && git pull --quiet)
-	rsync -a production.json scripts/cronjob.sh .bin/generate-linux echeclus.uberspace.de:packages/socialrunclubs.de/
-	rsync -a .repo/ echeclus.uberspace.de:packages/socialrunclubs.de/repo
-	ssh echeclus.uberspace.de chmod +x packages/socialrunclubs.de/cronjob.sh packages/socialrunclubs.de/generate-linux
+	rsync -a production.json scripts/cronjob.sh .bin/generate-linux $(SERVER):$(TARGET_DIR)/
+	rsync -a .repo/ $(SERVER):$(TARGET_DIR)/repo
+	ssh $(SERVER) chmod +x $(TARGET_DIR)/cronjob.sh $(TARGET_DIR)/generate-linux
 
 .phony: run-remote
 run-remote: sync
-	ssh echeclus.uberspace.de packages/socialrunclubs.de/cronjob.sh
+	ssh $(SERVER) $(TARGET_DIR)/cronjob.sh

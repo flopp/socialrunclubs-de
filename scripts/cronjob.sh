@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-TARGETS=(/var/www/virtual/floppnet/socialrunclubs.run/)
+TARGETS=(/var/www/virtual/floppnet/socialrunclubs.de/)
 
 rm -rf "${SCRIPT_DIR}/out"
 

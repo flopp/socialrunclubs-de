@@ -11,8 +11,8 @@ all:
 	mkdir -p .bin
 	GOOS=linux GOARCH=amd64 go build -o .bin/generate-linux cmd/generate/main.go
 
-.phony: build
-build:
+.phony: run-local
+run-local:
 	rm -rf .out
 	go run cmd/generate/main.go -config local.json
 

@@ -2,9 +2,11 @@ package app
 
 import (
 	"fmt"
+	"net/url"
 	"path/filepath"
+	"strings"
 
-	"github.com/flopp/socialrunclubs-de/internal"
+	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
 type TemplateData struct {
@@ -14,6 +16,7 @@ type TemplateData struct {
 	Title          string
 	Canonical      string
 	SubmitUrl      string // URL to submit a new club
+	ReportUrl      string // URL to report an issue with a club
 	Data           *Data
 	City           *City
 	Club           *Club
@@ -24,6 +27,14 @@ func (t TemplateData) IsRemoteTarget() bool {
 }
 func (t TemplateData) BasePath() string {
 	return t.basePath
+}
+func (t TemplateData) ReportLink() string {
+	if t.Club == nil {
+		return strings.ReplaceAll(t.ReportUrl, "NAME", "")
+	}
+
+	encodedCanonical := url.PathEscape(t.Canonical)
+	return strings.ReplaceAll(t.ReportUrl, "NAME", encodedCanonical)
 }
 
 func Render(data *Data, config Config) error {
@@ -62,8 +73,10 @@ func Render(data *Data, config Config) error {
 			basePath:       config.OutputDir,
 			Title:          page.Title,
 			Canonical:      page.Canonical,
+			SubmitUrl:      config.Google.SubmitUrl,
+			ReportUrl:      config.Google.ReportUrl,
 		}
-		if err := internal.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
+		if err := utils.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
 			return fmt.Errorf("rendering template %s: %w", page.Template, err)
 		}
 	}
@@ -78,9 +91,11 @@ func Render(data *Data, config Config) error {
 			basePath:       config.OutputDir,
 			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
 			Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", city.Slug()),
+			SubmitUrl:      config.Google.SubmitUrl,
+			ReportUrl:      config.Google.ReportUrl,
 		}
 		fileName := filepath.Join(config.OutputDir, city.Slug(), "index.html")
-		if err := internal.ExecuteTemplate("city.html", fileName, tdata); err != nil {
+		if err := utils.ExecuteTemplate("city.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering city template %q: %w", city.Name, err)
 		}
 
@@ -93,9 +108,11 @@ func Render(data *Data, config Config) error {
 				basePath:       config.OutputDir,
 				Title:          club.Name,
 				Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", club.Slug()),
+				SubmitUrl:      config.Google.SubmitUrl,
+				ReportUrl:      config.Google.ReportUrl,
 			}
 			fileName := filepath.Join(config.OutputDir, club.Slug(), "index.html")
-			if err := internal.ExecuteTemplate("club.html", fileName, tdata); err != nil {
+			if err := utils.ExecuteTemplate("club.html", fileName, tdata); err != nil {
 				return fmt.Errorf("rendering club template %q: %w", club.Name, err)
 			}
 		}

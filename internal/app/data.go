@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
-	"github.com/flopp/socialrunclubs-de/internal"
+	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
 type City struct {
@@ -16,7 +17,7 @@ type City struct {
 }
 
 func (c *City) Slug() string {
-	return fmt.Sprintf("/%s", internal.SanitizeName(c.Name))
+	return fmt.Sprintf("/%s", utils.SanitizeName(c.Name))
 }
 
 type Club struct {
@@ -26,7 +27,7 @@ type Club struct {
 	CityRaw        string
 	City           *City
 	LatLonRaw      string
-	LatLon         *internal.LatLon
+	LatLon         *utils.LatLon
 	Instagram      string
 	StravaClub     string
 	Website        string
@@ -36,7 +37,7 @@ type Club struct {
 }
 
 func (c *Club) Slug() string {
-	return fmt.Sprintf("/%s/%s", internal.SanitizeName(c.City.Name), internal.SanitizeName(c.Name))
+	return fmt.Sprintf("/%s/%s", utils.SanitizeName(c.City.Name), utils.SanitizeName(c.Name))
 }
 
 type Data struct {
@@ -57,13 +58,13 @@ func getVal(colName string, row []string, colIdx map[string]int) (string, error)
 	return strings.TrimSpace(row[col]), nil
 }
 
-func processCitiesSheet(sheet internal.Sheet, data *Data) error {
+func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	if len(sheet.Rows) == 0 {
 		return fmt.Errorf("sheet is empty")
 	}
 
 	required := []string{"NAME"}
-	colIdx, err := internal.ValidateColumns(sheet.Rows[0], required)
+	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
 	if err != nil {
 		return err
 	}
@@ -91,13 +92,13 @@ func processCitiesSheet(sheet internal.Sheet, data *Data) error {
 	return nil
 }
 
-func processClubsSheet(sheet internal.Sheet, data *Data) error {
+func processClubsSheet(sheet utils.Sheet, data *Data) error {
 	if len(sheet.Rows) == 0 {
 		return fmt.Errorf("sheet is empty")
 	}
 
 	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "NAME", "CITY", "COORDS", "DESCRIPTION", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
-	colIdx, err := internal.ValidateColumns(sheet.Rows[0], required)
+	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
 	if err != nil {
 		return err
 	}
@@ -151,12 +152,16 @@ func processClubsSheet(sheet internal.Sheet, data *Data) error {
 		club.Description = &descriptionHtml
 
 		if club.LatLonRaw != "" {
-			latlon, err := internal.ParseLatLon(club.LatLonRaw)
+			latlon, err := utils.ParseLatLon(club.LatLonRaw)
 			if err != nil {
 				log.Printf("CLUBS row %d: invalid coords: %q", index+2, club.LatLonRaw)
 				continue
 			}
 			club.LatLon = &latlon
+		}
+
+		if club.UpdatedRaw == club.AddedRaw {
+			club.UpdatedRaw = ""
 		}
 
 		if city, found := data.CityMap[club.CityRaw]; found {
@@ -184,14 +189,14 @@ func GetData(config Config) (*Data, error) {
 		CityMap: make(map[string]*City),
 	}
 
-	sheets, err := internal.GetSheets(config.Google.APIKey, config.Google.SheetId)
+	sheets, err := utils.GetSheets(config.Google.APIKey, config.Google.SheetId)
 	if err != nil {
 		return nil, fmt.Errorf("getting sheets: %v", err)
 	}
 
 	// get the clubs and cities sheets
-	if len(sheets) != 2 {
-		return nil, fmt.Errorf("expected 2 sheets, got %d", len(sheets))
+	if len(sheets) != 4 {
+		return nil, fmt.Errorf("expected 4 sheets, got %d", len(sheets))
 	}
 	for _, sheet := range sheets {
 		switch sheet.Name {
@@ -203,9 +208,23 @@ func GetData(config Config) (*Data, error) {
 			if err := processCitiesSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing cities sheet: %v", err)
 			}
+		case "SUBMIT":
+			// ignore
+		case "REPORT":
+			// ignore
 		default:
 			return nil, fmt.Errorf("unknown sheet name: %s", sheet.Name)
 		}
+	}
+
+	// sorting
+	sort.Slice(data.Cities, func(i, j int) bool {
+		return data.Cities[i].Name < data.Cities[j].Name
+	})
+	for _, city := range data.Cities {
+		sort.Slice(city.Clubs, func(i, j int) bool {
+			return city.Clubs[i].Name < city.Clubs[j].Name
+		})
 	}
 
 	return data, nil

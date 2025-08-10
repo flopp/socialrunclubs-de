@@ -23,10 +23,16 @@
     <div id="club-map" data-name="{{.Club.Name}}" data-lat="{{.Club.LatLon.Lat}}" data-lon="{{.Club.LatLon.Lon}}"></div>
     {{end}}
 
+    <small>
+        (Hinzugefügt am: {{.Club.AddedRaw}}{{if .Club.UpdatedRaw}}, aktualisiert am: {{.Club.UpdatedRaw}}{{end}})
+    </small>
+
     <p>
-        Hinzugefügt am: {{.Club.AddedRaw}}
-        {{if .Club.UpdatedRaw}}, aktualisiert am: {{.Club.UpdatedRaw}}{{end}}
+        Sind die Informationen fehlerhaft oder gibt es ein anderes Problem mit diesem Eintrag?
     </p>
+    <div>
+        <a role="button" href="{{.ReportLink}}" target="_blank">Fehler melden</a>
+    </div>
 </section>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

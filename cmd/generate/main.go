@@ -5,8 +5,8 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/flopp/socialrunclubs-de/internal"
 	"github.com/flopp/socialrunclubs-de/internal/app"
+	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	staticFiles := []string{"static/style.css"}
 	for _, file := range staticFiles {
 		dest := filepath.Join(config.OutputDir, "static", filepath.Base(file))
-		if err := internal.CopyFile(file, dest); err != nil {
+		if err := utils.CopyFile(file, dest); err != nil {
 			log.Fatalf("Error copying static file %s to %s: %v", file, dest, err)
 		}
 	}

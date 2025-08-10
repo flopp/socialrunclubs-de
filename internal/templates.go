@@ -13,6 +13,11 @@ type TemplateData struct {
 	// base configuration
 	IsRemoteTarget bool
 	BasePath       string
+	LastUpdate     string
+
+	// page specific data
+	Title     string
+	Canonical string
 }
 
 var templates = make(map[string]*template.Template)

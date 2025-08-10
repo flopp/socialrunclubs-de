@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/flopp/socialrunclubs-de/internal"
 )
@@ -52,10 +53,9 @@ func main() {
 	// use config
 	fmt.Printf("Output directory: %s\n", config.OutputDir)
 
-	// create output directory if it doesn't exist
-	if err := os.MkdirAll(config.OutputDir, 0755); err != nil {
-		log.Fatalf("Error creating output directory: %v", err)
-	}
+	// get current time
+	now := time.Now()
+	nowStr := now.Format("2006-01-02 15:04:05")
 
 	// copy static files to output directory
 	staticFiles := []string{"static/style.css"}
@@ -67,12 +67,43 @@ func main() {
 	}
 
 	// render templates
-
 	data := internal.TemplateData{
 		IsRemoteTarget: config.IsRemoteTarget,
 		BasePath:       config.OutputDir,
+		LastUpdate:     nowStr,
 	}
-	if err := internal.ExecuteTemplate("index.html", filepath.Join(config.OutputDir, "index.html"), data); err != nil {
-		log.Fatalf("Error rendering template: %v", err)
+
+	pages := []struct {
+		Title     string
+		Canonical string
+		Template  string
+		OutFile   string
+	}{
+		{
+			Title:     "Social Run Clubs in Deutschland",
+			Canonical: "https://socialrunclubs.de/",
+			Template:  "index.html",
+			OutFile:   "index.html",
+		},
+		{
+			Title:     "Informationen",
+			Canonical: "https://socialrunclubs.de/infos.html",
+			Template:  "infos.html",
+			OutFile:   "infos.html",
+		},
+		{
+			Title:     "Deutsche Städte mit Social Run Clubs",
+			Canonical: "https://socialrunclubs.de/cities.html",
+			Template:  "cities.html",
+			OutFile:   "cities.html",
+		},
+	}
+
+	for _, page := range pages {
+		data.Title = page.Title
+		data.Canonical = page.Canonical
+		if err := internal.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), data); err != nil {
+			log.Fatalf("Error rendering template %s: %v", page.Template, err)
+		}
 	}
 }

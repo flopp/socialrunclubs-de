@@ -1,0 +1,20 @@
+body>header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body>header .container>a {
+    margin: calc(var(--pico-spacing) * -.125) calc(var(--pico-spacing) * -.25);
+    padding: calc(var(--pico-spacing) * .125) calc(var(--pico-spacing) * .25);
+    border-radius: var(--pico-border-radius);
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body>main {
+    flex-grow: 1;
+}

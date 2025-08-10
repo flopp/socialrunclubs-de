@@ -5,9 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <title>Social Run Clubs in Deutschland</title>
+    <title>{{.Title}}</title>
+    <link rel="canonical" href="{{.Canonical}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <link rel="stylesheet" href="{{BasePath " static/style.css"}}">
+    <link rel="stylesheet" href="{{BasePath "static/style.css"}}">
     {{if .IsRemoteTarget}}
     <script defer src="https://cloud.umami.is/script.js"
         data-website-id="22294653-b924-4353-91a0-5abc871d5546"></script>
@@ -15,9 +16,20 @@
 </head>
 
 <body>
-    <header class="container">
-        <hgroup>Social Run Clubs 🇩🇪</hgroup>
-        <nav>
-                    </nav>
+    <header>
+        <div class="container">
+            <a href="{{BasePath "/"}}">
+                Social Run Clubs 🇩🇪
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{BasePath "/cities.html"}}">Städte</a></li>
+                    <li><a href="{{BasePath "/infos.html"}}">Infos</a></li>
+                </ul>
+                <ul class="icons">
+                    <li><a href="https://github.com/flopp/socialrunclubs-de" target="_blank">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
     <main class="container">

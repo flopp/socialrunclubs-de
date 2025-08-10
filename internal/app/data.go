@@ -189,7 +189,9 @@ func GetData(config Config) (*Data, error) {
 		CityMap: make(map[string]*City),
 	}
 
-	sheets, err := utils.GetSheets(config.Google.APIKey, config.Google.SheetId)
+	sheets, err := utils.Retry(3, 8*time.Second, func() ([]utils.Sheet, error) {
+		return utils.GetSheets(config.Google.APIKey, config.Google.SheetId)
+	})
 	if err != nil {
 		return nil, fmt.Errorf("getting sheets: %v", err)
 	}

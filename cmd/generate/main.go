@@ -4,45 +4,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/flopp/socialrunclubs-de/internal"
 )
 
 type Config struct {
-	OutputDir string
-}
-
-// copyFile copies a file from src to dst. If dst exists, it will be overwritten.
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		cerr := out.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
-
-	if _, err = io.Copy(out, in); err != nil {
-		return err
-	}
-
-	// Copy file permissions
-	info, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	return os.Chmod(dst, info.Mode())
+	IsRemoteTarget bool
+	OutputDir      string
 }
 
 // loadConfig loads configuration from a JSON file into the given config struct.
@@ -57,6 +28,13 @@ func loadConfig(filename string, config *Config) error {
 	if err := decoder.Decode(config); err != nil {
 		return err
 	}
+
+	abs, err := filepath.Abs(config.OutputDir)
+	if err != nil {
+		return err
+	}
+	config.OutputDir = abs
+
 	return nil
 }
 
@@ -80,11 +58,21 @@ func main() {
 	}
 
 	// copy static files to output directory
-	staticFiles := []string{"static/index.html", "static/style.css"}
+	staticFiles := []string{"static/style.css"}
 	for _, file := range staticFiles {
-		dest := filepath.Join(config.OutputDir, filepath.Base(file))
-		if err := copyFile(file, dest); err != nil {
+		dest := filepath.Join(config.OutputDir, "static", filepath.Base(file))
+		if err := internal.CopyFile(file, dest); err != nil {
 			log.Fatalf("Error copying static file %s to %s: %v", file, dest, err)
 		}
+	}
+
+	// render templates
+
+	data := internal.TemplateData{
+		IsRemoteTarget: config.IsRemoteTarget,
+		BasePath:       config.OutputDir,
+	}
+	if err := internal.ExecuteTemplate("index.html", filepath.Join(config.OutputDir, "index.html"), data); err != nil {
+		log.Fatalf("Error rendering template: %v", err)
 	}
 }

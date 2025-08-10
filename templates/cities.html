@@ -2,6 +2,19 @@
 
 <section>
     <h1>Deutsche Städte mit Social Run Clubs</h1>
+
+    <ul>
+        {{range .Data.Cities}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Clubs)</li>
+        {{end}}
+    </ul>
+
+    <p>
+        Deine Stadt ist nicht mit dabei? Kein Problem, du kannst hier einen bestehenden Social Run Club deiner Stadt hinzufügen:
+    </p>
+    <div>
+        <a role="button" href="{{.SubmitUrl}}">Social Run Club hinzufügen</a>
+    </div>
 </section>
 
 {{template "footer.html" .}}

@@ -9,15 +9,9 @@ import (
 	"strings"
 )
 
-type TemplateData struct {
-	// base configuration
-	IsRemoteTarget bool
-	BasePath       string
-	LastUpdate     string
-
-	// page specific data
-	Title     string
-	Canonical string
+type TemplateData interface {
+	IsRemoteTarget() bool
+	BasePath() string
 }
 
 var templates = make(map[string]*template.Template)
@@ -38,17 +32,20 @@ func loadTemplate(name string, data TemplateData) (*template.Template, error) {
 	files = append(files, parts...)
 	t, err := template.New(name).Funcs(template.FuncMap{
 		"BasePath": func(p string) string {
-			if data.IsRemoteTarget {
+			if data.IsRemoteTarget() {
 				return p // no base path for remote targets
 			}
 
-			res := data.BasePath
+			res := data.BasePath()
 			if !strings.HasPrefix(p, "/") {
 				res += "/"
 			}
 			res += p
+
 			if strings.HasSuffix(p, "/") {
 				res += "index.html"
+			} else if !strings.Contains(filepath.Base(p), ".") {
+				res += "/index.html"
 			}
 			return res
 		},

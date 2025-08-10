@@ -18,3 +18,18 @@ body {
 body>main {
     flex-grow: 1;
 }
+
+#club-map {
+    height: 400px;
+    width: 100%;
+}
+
+.leaflet-container [role=button] {
+    padding: 0px 0px;
+}
+
+.leaflet-marker-pane [role=button] {
+    border: none;
+    background-color: transparent;
+    padding: 0px 0px;
+}

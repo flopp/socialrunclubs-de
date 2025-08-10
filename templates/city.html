@@ -1,0 +1,29 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>Social Run Clubs in {{.City.Name}}</h1>
+
+    {{if .City.Clubs}}
+    <p>
+        Im {{.City.Name}} gibt es folgende Social Run Clubs:
+    </p>
+    <ul>
+        {{range .City.Clubs}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
+        {{end}}
+    </ul>
+    <p>
+        Dein Club ist nicht mit dabei? Kein Problem, du kannst ihn hier hinzufügen:
+    </p>
+    {{else}}
+    <p>
+        Wir haben noch keine Social Run Clubs für {{.City.Name}} in unserem Verzeichnis.
+        Hilf uns und füge einen bestehenden Club hinzu:
+    </p>
+    {{end}}
+    <div>
+        <a role="button" href="{{.SubmitUrl}}">Social Run Club hinzufügen</a>
+    </div>
+</section>
+
+{{template "footer.html" .}}

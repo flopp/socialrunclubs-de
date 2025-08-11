@@ -66,10 +66,16 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			OutFile:   "index.html",
 		},
 		{
-			Title:     "Informationen",
-			Canonical: "https://socialrunclubs.de/infos.html",
-			Template:  "infos.html",
-			OutFile:   "infos.html",
+			Title:     "Impressum",
+			Canonical: "https://socialrunclubs.de/impressum.html",
+			Template:  "impressum.html",
+			OutFile:   "impressum.html",
+		},
+		{
+			Title:     "Datenschutz",
+			Canonical: "https://socialrunclubs.de/datenschutz.html",
+			Template:  "datenschutz.html",
+			OutFile:   "datenschutz.html",
 		},
 		{
 			Title:     "Deutsche Städte mit Social Run Clubs",

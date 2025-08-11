@@ -41,27 +41,28 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	cssFiles = append(cssFiles, picocss)
 
 	// leaflet
-	leafletCSS, err := download("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css", "static/leaflet.HASH.css", config)
+	leafletUrl := "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist"
+	leafletCSS, err := download(leafletUrl+"/leaflet.min.css", "static/leaflet.HASH.css", config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("download leaflet.css: %w", err)
 	}
 	cssFiles = append(cssFiles, leafletCSS)
 
-	leafletJS, err := download("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js", "static/leaflet.HASH.js", config)
+	leafletJS, err := download(leafletUrl+"/leaflet.min.js", "static/leaflet.HASH.js", config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("download leaflet.js: %w", err)
 	}
 	jsFiles = append(jsFiles, leafletJS)
 
-	if _, err := download("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-icon.png", "static/images/marker-icon.png", config); err != nil {
+	if _, err := download(leafletUrl+"/images/marker-icon.png", "static/images/marker-icon.png", config); err != nil {
 		return nil, nil, fmt.Errorf("download marker-icon.png: %w", err)
 	}
 
-	if _, err := download("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-icon-2x.png", "static/images/marker-icon-2x.png", config); err != nil {
+	if _, err := download(leafletUrl+"/images/marker-icon-2x.png", "static/images/marker-icon-2x.png", config); err != nil {
 		return nil, nil, fmt.Errorf("download marker-icon-2x.png: %w", err)
 	}
 
-	if _, err := download("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png", "static/images/marker-shadow.png", config); err != nil {
+	if _, err := download(leafletUrl+"/images/marker-shadow.png", "static/images/marker-shadow.png", config); err != nil {
 		return nil, nil, fmt.Errorf("download marker-shadow.png: %w", err)
 	}
 

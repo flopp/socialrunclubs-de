@@ -8,6 +8,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.7.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c // indirect
+	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect

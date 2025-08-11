@@ -3,10 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"path/filepath"
 
 	"github.com/flopp/socialrunclubs-de/internal/app"
-	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
 func main() {
@@ -27,12 +25,8 @@ func main() {
 	}
 
 	// copy static files to output directory
-	staticFiles := []string{"static/style.css"}
-	for _, file := range staticFiles {
-		dest := filepath.Join(config.OutputDir, "static", filepath.Base(file))
-		if err := utils.CopyFile(file, dest); err != nil {
-			log.Fatalf("Error copying static file %s to %s: %v", file, dest, err)
-		}
+	if err := app.CopyAssets(config); err != nil {
+		log.Fatalf("Error copying assets: %v", err)
 	}
 
 	// render pages

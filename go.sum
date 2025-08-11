@@ -8,6 +8,8 @@ github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c h1:HNRXT/BVRhDaHuFjFQ81mHd+DAmkRJXIELEL05LCDpk=
 github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c/go.mod h1:7y/2PxXfR1mGtIQFNtFE1daHIka2e8J480Bsm+MiCpk=
+github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258 h1:BwkqZZzqprz5b+Wp7EKDlukuwOdQxGvYyRTv1yOzC0k=
+github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258/go.mod h1:6avocwCMVrCHkEhUbuEEDKxjXOtQsXmCzdFclLQ5sUg=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=

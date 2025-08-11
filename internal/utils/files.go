@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/flopp/go-filehash"
 )
 
 func MakeDir(dir string) error {
@@ -51,4 +53,16 @@ func CopyFile(src, dst string) error {
 	}
 
 	return nil
+}
+
+func CopyHash(src, dst string) (string, error) {
+	return filehash.Copy(src, dst, "HASH")
+}
+
+func MustCopyHash(src, dst string) string {
+	res, err := CopyHash(src, dst)
+	if err != nil {
+		panic(err)
+	}
+	return res
 }

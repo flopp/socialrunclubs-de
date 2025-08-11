@@ -7,12 +7,9 @@
     <meta name="color-scheme" content="light dark">
     <title>{{.Title}}</title>
     <link rel="canonical" href="{{.Canonical}}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <link rel="stylesheet" href="{{BasePath "/static/style.css"}}">
-    {{if .IsRemoteTarget}}
-    <script defer src="https://cloud.umami.is/script.js"
-        data-website-id="22294653-b924-4353-91a0-5abc871d5546"></script>
+    {{range .CssFiles}}<link rel="stylesheet" href="{{BasePath .}}">
     {{end}}
+    {{if .IsRemoteTarget}}<script defer src="{{.UmamiJS}}" data-website-id="22294653-b924-4353-91a0-5abc871d5546"></script>{{end}}
 </head>
 
 <body>

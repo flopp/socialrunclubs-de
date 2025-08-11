@@ -25,12 +25,13 @@ func main() {
 	}
 
 	// copy static files to output directory
-	if err := app.CopyAssets(config); err != nil {
+	cssFiles, jsFiles, err := app.CopyAssets(config)
+	if err != nil {
 		log.Fatalf("Error copying assets: %v", err)
 	}
 
 	// render pages
-	if err := app.Render(data, config); err != nil {
+	if err := app.Render(data, cssFiles, jsFiles, config); err != nil {
 		log.Fatalf("Error rendering data: %v", err)
 	}
 }

@@ -197,16 +197,17 @@ func GetData(config Config) (*Data, error) {
 	}
 
 	// get the clubs and cities sheets
-	if len(sheets) != 4 {
-		return nil, fmt.Errorf("expected 4 sheets, got %d", len(sheets))
-	}
+	clubsFound := false
+	citiesFound := false
 	for _, sheet := range sheets {
 		switch sheet.Name {
 		case "CLUBS":
+			clubsFound = true
 			if err := processClubsSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing clubs sheet: %v", err)
 			}
 		case "CITIES":
+			citiesFound = true
 			if err := processCitiesSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing cities sheet: %v", err)
 			}
@@ -215,8 +216,18 @@ func GetData(config Config) (*Data, error) {
 		case "REPORT":
 			// ignore
 		default:
+			if strings.Contains(sheet.Name, "IGNORE") {
+				continue
+			}
 			return nil, fmt.Errorf("unknown sheet name: %s", sheet.Name)
 		}
+	}
+
+	if !clubsFound {
+		return nil, fmt.Errorf("missing clubs sheet")
+	}
+	if !citiesFound {
+		return nil, fmt.Errorf("missing cities sheet")
 	}
 
 	// sorting

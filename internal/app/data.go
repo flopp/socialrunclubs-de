@@ -41,10 +41,11 @@ func (c *Club) Slug() string {
 }
 
 type Data struct {
-	Now     time.Time
-	NowStr  string
-	Cities  []*City
-	CityMap map[string]*City
+	Now         time.Time
+	NowStr      string
+	Cities      []*City
+	CityMap     map[string]*City
+	LatestClubs []*Club
 }
 
 func getVal(colName string, row []string, colIdx map[string]int) (string, error) {
@@ -238,6 +239,25 @@ func GetData(config Config) (*Data, error) {
 		sort.Slice(city.Clubs, func(i, j int) bool {
 			return city.Clubs[i].Name < city.Clubs[j].Name
 		})
+	}
+
+	// collect clubs by added date
+	var addedClubs []*Club
+	for _, city := range data.Cities {
+		for _, club := range city.Clubs {
+			if club.AddedRaw != "" {
+				addedClubs = append(addedClubs, club)
+			}
+		}
+	}
+	sort.Slice(addedClubs, func(i, j int) bool {
+		return addedClubs[i].AddedRaw > addedClubs[j].AddedRaw
+	})
+	// get 5 latest clubs
+	if len(addedClubs) > 5 {
+		data.LatestClubs = addedClubs[:5]
+	} else {
+		data.LatestClubs = addedClubs
 	}
 
 	return data, nil

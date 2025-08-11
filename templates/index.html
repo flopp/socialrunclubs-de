@@ -11,6 +11,15 @@
         Auf der <a href="{{BasePath "/cities.html"}}">Städte-Seite</a> findest du eine Übersicht aller Städte mit Social Run Clubs.<br />
         Mit unserem <a href="{{.SubmitUrl}}" target="_blank">Formular</a> kannst du einen neuen Social Run Club hinzufügen.
     </p>
+
+    <p>
+        Hier sind die Clubs, die zuletzt hinzugefügt wurden:
+    </p>
+    <ul>
+        {{range .Data.LatestClubs}}
+        <li><a href="{{.Slug}}">{{.Name}}</a> ({{.City.Name}})</li>
+        {{end}}
+    </ul>
 </section>
 
 <section>

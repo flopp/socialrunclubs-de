@@ -7,7 +7,7 @@ all:
 	@echo "make sync       -> build and upload to socialrunclubs.de"
 	@echo "make run-remote -> sync & run remote script"
 
- .bin/generate-linux: cmd/generate/main.go go.mod
+ .bin/generate-linux: cmd/generate/main.go go.mod internal/utils/*.go internal/app/*.go templates/*.html templates/parts/*.html
 	mkdir -p .bin
 	GOOS=linux GOARCH=amd64 go build -o .bin/generate-linux cmd/generate/main.go
 

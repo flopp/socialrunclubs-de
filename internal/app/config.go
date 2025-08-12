@@ -15,6 +15,9 @@ type Config struct {
 		SubmitUrl string
 		ReportUrl string
 	}
+	AHrefs struct {
+		IndexNow string
+	}
 }
 
 // loadConfig loads configuration from a JSON file into the given config struct.

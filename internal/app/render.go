@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -50,6 +51,14 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			umamiJS = jsFile
 		} else {
 			otherJS = append(otherJS, jsFile)
+		}
+	}
+
+	// create indexnow.txt file
+	if config.AHrefs.IndexNow != "" {
+		filename := filepath.Join(config.OutputDir, config.AHrefs.IndexNow+".txt")
+		if err := os.WriteFile(filename, []byte(config.AHrefs.IndexNow), 0644); err != nil {
+			return fmt.Errorf("writing indexnow file %q: %w", filename, err)
 		}
 	}
 
@@ -103,7 +112,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
 			CssFiles:       cssFiles,
-			JSFiles:        jsFiles,
+			JSFiles:        otherJS,
 			UmamiJS:        umamiJS,
 		}
 		if err := utils.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
@@ -125,7 +134,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
 			CssFiles:       cssFiles,
-			JSFiles:        jsFiles,
+			JSFiles:        otherJS,
 			UmamiJS:        umamiJS,
 		}
 		fileName := filepath.Join(config.OutputDir, city.Slug(), "index.html")
@@ -146,7 +155,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 				SubmitUrl:      config.Google.SubmitUrl,
 				ReportUrl:      config.Google.ReportUrl,
 				CssFiles:       cssFiles,
-				JSFiles:        jsFiles,
+				JSFiles:        otherJS,
 				UmamiJS:        umamiJS,
 			}
 			fileName := filepath.Join(config.OutputDir, club.Slug(), "index.html")

@@ -76,6 +76,9 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		}
 	}
 
+	// collect all canonical URLs for creating a sitemap
+	sitemapUrls := make([]string, 0)
+
 	// render templates
 	pages := []struct {
 		Title       string
@@ -132,6 +135,8 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		if err := utils.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
 			return fmt.Errorf("rendering template %s: %w", page.Template, err)
 		}
+
+		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 	}
 
 	// render city pages
@@ -155,6 +160,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		if err := utils.ExecuteTemplate("city.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering city template %q: %w", city.Name, err)
 		}
+		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 
 		for _, club := range city.Clubs {
 			tdata := TemplateData{
@@ -176,7 +182,23 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			if err := utils.ExecuteTemplate("club.html", fileName, tdata); err != nil {
 				return fmt.Errorf("rendering club template %q: %w", club.Name, err)
 			}
+			sitemapUrls = append(sitemapUrls, tdata.Canonical)
 		}
+	}
+
+	// create sitemap.xml
+	sitemapFile := filepath.Join(config.OutputDir, "sitemap.xml")
+	sitemapData := make([]byte, 0)
+	sitemapData = append(sitemapData, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")...)
+	sitemapData = append(sitemapData, []byte("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap-image/1.1\">\n")...)
+	for _, url := range sitemapUrls {
+		sitemapData = append(sitemapData, []byte("  <url>\n")...)
+		sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <loc>%s</loc>\n", url))...)
+		sitemapData = append(sitemapData, []byte("  </url>\n")...)
+	}
+	sitemapData = append(sitemapData, []byte("</urlset>\n")...)
+	if err := os.WriteFile(sitemapFile, sitemapData, 0644); err != nil {
+		return fmt.Errorf("writing sitemap file: %w", err)
 	}
 
 	return nil

@@ -3,10 +3,13 @@
 <section>
     <h1>{{.Club.Name}}</h1>
 
-    <p>in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a></p>
+    <p>{{.Club.Name}} is ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a></p>
 
     <p>{{.Club.Description}}</p>
 
+    <p>
+        Weitere Informationen zu Club-Läufen, Terminen und Treffpunkten findest du hier:
+    </p>
     <ul>
         {{if .Club.Instagram}}
         <li><a href="{{.Club.Instagram}}">Instagram</a></li>

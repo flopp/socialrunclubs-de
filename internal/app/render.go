@@ -14,6 +14,7 @@ type TemplateData struct {
 	basePath       string
 	LastUpdate     string
 	Title          string
+	Description    string
 	Canonical      string
 	SubmitUrl      string // URL to submit a new club
 	ReportUrl      string // URL to report an issue with a club
@@ -54,34 +55,39 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 
 	// render templates
 	pages := []struct {
-		Title     string
-		Canonical string
-		Template  string
-		OutFile   string
+		Title       string
+		Description string
+		Canonical   string
+		Template    string
+		OutFile     string
 	}{
 		{
-			Title:     "Social Run Clubs in Deutschland",
-			Canonical: "https://socialrunclubs.de/",
-			Template:  "index.html",
-			OutFile:   "index.html",
+			Title:       "Social Run Clubs in Deutschland",
+			Description: "Eine Übersicht über alle Social Run Clubs in Deutschland.",
+			Canonical:   "https://socialrunclubs.de/",
+			Template:    "index.html",
+			OutFile:     "index.html",
 		},
 		{
-			Title:     "Impressum",
-			Canonical: "https://socialrunclubs.de/impressum.html",
-			Template:  "impressum.html",
-			OutFile:   "impressum.html",
+			Title:       "Impressum",
+			Description: "Impressum von socialrunclubs.de.",
+			Canonical:   "https://socialrunclubs.de/impressum.html",
+			Template:    "impressum.html",
+			OutFile:     "impressum.html",
 		},
 		{
-			Title:     "Datenschutz",
-			Canonical: "https://socialrunclubs.de/datenschutz.html",
-			Template:  "datenschutz.html",
-			OutFile:   "datenschutz.html",
+			Title:       "Datenschutz",
+			Description: "Datenschutz von socialrunclubs.de.",
+			Canonical:   "https://socialrunclubs.de/datenschutz.html",
+			Template:    "datenschutz.html",
+			OutFile:     "datenschutz.html",
 		},
 		{
-			Title:     "Deutsche Städte mit Social Run Clubs",
-			Canonical: "https://socialrunclubs.de/cities.html",
-			Template:  "cities.html",
-			OutFile:   "cities.html",
+			Title:       "Deutsche Städte mit Social Run Clubs",
+			Description: "Eine Übersicht über alle Städte mit Social Run Clubs.",
+			Canonical:   "https://socialrunclubs.de/cities.html",
+			Template:    "cities.html",
+			OutFile:     "cities.html",
 		},
 	}
 	for _, page := range pages {
@@ -92,6 +98,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			isRemoteTarget: config.IsRemoteTarget,
 			basePath:       config.OutputDir,
 			Title:          page.Title,
+			Description:    page.Description,
 			Canonical:      page.Canonical,
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
@@ -113,6 +120,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			isRemoteTarget: config.IsRemoteTarget,
 			basePath:       config.OutputDir,
 			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
+			Description:    fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s.", city.Name),
 			Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", city.Slug()),
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
@@ -133,6 +141,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 				isRemoteTarget: config.IsRemoteTarget,
 				basePath:       config.OutputDir,
 				Title:          club.Name,
+				Description:    fmt.Sprintf("Informationen zum Social Run Club '%s' in %s.", club.Name, city.Name),
 				Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", club.Slug()),
 				SubmitUrl:      config.Google.SubmitUrl,
 				ReportUrl:      config.Google.ReportUrl,

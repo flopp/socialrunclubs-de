@@ -190,7 +190,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 	sitemapFile := filepath.Join(config.OutputDir, "sitemap.xml")
 	sitemapData := make([]byte, 0)
 	sitemapData = append(sitemapData, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")...)
-	sitemapData = append(sitemapData, []byte("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap-image/1.1\">\n")...)
+	sitemapData = append(sitemapData, []byte("<urlset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")...)
 	for _, url := range sitemapUrls {
 		sitemapData = append(sitemapData, []byte("  <url>\n")...)
 		sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <loc>%s</loc>\n", url))...)

@@ -46,6 +46,7 @@ type Data struct {
 	Cities      []*City
 	CityMap     map[string]*City
 	LatestClubs []*Club
+	NumberClubs int
 }
 
 func getVal(colName string, row []string, colIdx map[string]int) (string, error) {
@@ -57,40 +58,6 @@ func getVal(colName string, row []string, colIdx map[string]int) (string, error)
 		return "", nil
 	}
 	return strings.TrimSpace(row[col]), nil
-}
-
-func processCitiesSheet(sheet utils.Sheet, data *Data) error {
-	if len(sheet.Rows) == 0 {
-		return fmt.Errorf("sheet is empty")
-	}
-
-	required := []string{"NAME"}
-	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
-	if err != nil {
-		return err
-	}
-
-	for index, row := range sheet.Rows[1:] {
-		city := &City{}
-		if city.Name, err = getVal("NAME", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if _, found := data.CityMap[city.Name]; found {
-			continue
-		}
-
-		// skip invalid cities
-		if city.Name == "" {
-			log.Printf("CITIES row %d: empty city name: %q", index+2, city.Name)
-			continue
-		}
-
-		city.Clubs = make([]*Club, 0)
-		data.Cities = append(data.Cities, city)
-		data.CityMap[city.Name] = city
-	}
-
-	return nil
 }
 
 func processClubsSheet(sheet utils.Sheet, data *Data) error {
@@ -184,10 +151,11 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 
 func GetData(config Config) (*Data, error) {
 	data := &Data{
-		Now:     time.Now(),
-		NowStr:  time.Now().Format("2006-01-02 15:04:05"),
-		Cities:  make([]*City, 0),
-		CityMap: make(map[string]*City),
+		Now:         time.Now(),
+		NowStr:      time.Now().Format("2006-01-02 15:04:05"),
+		Cities:      make([]*City, 0),
+		CityMap:     make(map[string]*City),
+		NumberClubs: 0,
 	}
 
 	sheets, err := utils.Retry(3, 8*time.Second, func() ([]utils.Sheet, error) {
@@ -199,18 +167,12 @@ func GetData(config Config) (*Data, error) {
 
 	// get the clubs and cities sheets
 	clubsFound := false
-	citiesFound := false
 	for _, sheet := range sheets {
 		switch sheet.Name {
 		case "CLUBS":
 			clubsFound = true
 			if err := processClubsSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing clubs sheet: %v", err)
-			}
-		case "CITIES":
-			citiesFound = true
-			if err := processCitiesSheet(sheet, data); err != nil {
-				return nil, fmt.Errorf("processing cities sheet: %v", err)
 			}
 		case "SUBMIT":
 			// ignore
@@ -226,9 +188,6 @@ func GetData(config Config) (*Data, error) {
 
 	if !clubsFound {
 		return nil, fmt.Errorf("missing clubs sheet")
-	}
-	if !citiesFound {
-		return nil, fmt.Errorf("missing cities sheet")
 	}
 
 	// sorting
@@ -248,6 +207,7 @@ func GetData(config Config) (*Data, error) {
 			if club.AddedRaw != "" {
 				addedClubs = append(addedClubs, club)
 			}
+			data.NumberClubs++
 		}
 	}
 	sort.Slice(addedClubs, func(i, j int) bool {

@@ -32,8 +32,12 @@ func loadTemplate(name string, data TemplateData) (*template.Template, error) {
 	files = append(files, parts...)
 	t, err := template.New(name).Funcs(template.FuncMap{
 		"BasePath": func(p string) string {
+			ifFile := strings.Contains(filepath.Base(p), ".")
 			if data.IsRemoteTarget() {
-				return p // no base path for remote targets
+				if !ifFile && !strings.HasSuffix(p, "/") {
+					return p + "/"
+				}
+				return p
 			}
 
 			res := data.BasePath()

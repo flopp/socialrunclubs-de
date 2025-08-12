@@ -54,6 +54,20 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		}
 	}
 
+	canonical := func(p string) string {
+		b := "https://socialrunclubs.de"
+		if !strings.HasPrefix(p, "/") {
+			b += "/"
+		}
+		b += p
+
+		if !strings.Contains(p, ".") && !strings.HasSuffix(p, "/") {
+			b += "/"
+		}
+
+		return b
+	}
+
 	// create indexnow.txt file
 	if config.AHrefs.IndexNow != "" {
 		filename := filepath.Join(config.OutputDir, config.AHrefs.IndexNow+".txt")
@@ -73,28 +87,28 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		{
 			Title:       "Social Run Clubs in Deutschland",
 			Description: "Eine Übersicht über alle Social Run Clubs in Deutschland.",
-			Canonical:   "https://socialrunclubs.de/",
+			Canonical:   "/",
 			Template:    "index.html",
 			OutFile:     "index.html",
 		},
 		{
 			Title:       "Impressum",
 			Description: "Impressum von socialrunclubs.de.",
-			Canonical:   "https://socialrunclubs.de/impressum.html",
+			Canonical:   "/impressum.html",
 			Template:    "impressum.html",
 			OutFile:     "impressum.html",
 		},
 		{
 			Title:       "Datenschutz",
 			Description: "Datenschutz von socialrunclubs.de.",
-			Canonical:   "https://socialrunclubs.de/datenschutz.html",
+			Canonical:   "datenschutz.html",
 			Template:    "datenschutz.html",
 			OutFile:     "datenschutz.html",
 		},
 		{
 			Title:       "Deutsche Städte mit Social Run Clubs",
 			Description: "Eine Übersicht über alle Städte mit Social Run Clubs.",
-			Canonical:   "https://socialrunclubs.de/cities.html",
+			Canonical:   "/cities.html",
 			Template:    "cities.html",
 			OutFile:     "cities.html",
 		},
@@ -108,7 +122,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			basePath:       config.OutputDir,
 			Title:          page.Title,
 			Description:    page.Description,
-			Canonical:      page.Canonical,
+			Canonical:      canonical(page.Canonical),
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
 			CssFiles:       cssFiles,
@@ -130,7 +144,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			basePath:       config.OutputDir,
 			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
 			Description:    fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s.", city.Name),
-			Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", city.Slug()),
+			Canonical:      canonical(city.Slug()),
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
 			CssFiles:       cssFiles,
@@ -151,7 +165,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 				basePath:       config.OutputDir,
 				Title:          club.Name,
 				Description:    fmt.Sprintf("Informationen zum Social Run Club '%s' in %s.", club.Name, city.Name),
-				Canonical:      fmt.Sprintf("https://socialrunclubs.de/%s", club.Slug()),
+				Canonical:      canonical(club.Slug()),
 				SubmitUrl:      config.Google.SubmitUrl,
 				ReportUrl:      config.Google.ReportUrl,
 				CssFiles:       cssFiles,

@@ -46,6 +46,7 @@ type Data struct {
 	Cities      []*City
 	CityMap     map[string]*City
 	LatestClubs []*Club
+	TopCities   []*City
 	NumberClubs int
 }
 
@@ -218,6 +219,22 @@ func GetData(config Config) (*Data, error) {
 		data.LatestClubs = addedClubs[:5]
 	} else {
 		data.LatestClubs = addedClubs
+	}
+
+	// get the 5 cities with the most clubs:
+	var topCities []*City
+	for _, city := range data.Cities {
+		if len(city.Clubs) > 0 {
+			topCities = append(topCities, city)
+		}
+	}
+	sort.Slice(topCities, func(i, j int) bool {
+		return len(topCities[i].Clubs) > len(topCities[j].Clubs)
+	})
+	if len(topCities) > 5 {
+		data.TopCities = topCities[:5]
+	} else {
+		data.TopCities = topCities
 	}
 
 	return data, nil

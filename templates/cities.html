@@ -5,7 +5,7 @@
 
     <ul>
         {{range .Data.Cities}}
-        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Clubs)</li>
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
         {{end}}
     </ul>
 

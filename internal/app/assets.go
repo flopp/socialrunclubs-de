@@ -94,5 +94,18 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	}
 	jsFiles = append(jsFiles, scriptJS)
 
+	icons := []string{
+		"apple-touch-icon.png",
+		"favicon-96x96.png",
+		"favicon.ico",
+		"favicon.svg",
+		"logo.svg",
+	}
+	for _, icon := range icons {
+		if err := utils.CopyFile("static/"+icon, filepath.Join(config.OutputDir, icon)); err != nil {
+			return nil, nil, fmt.Errorf("copy static file %s: %w", "static/"+icon, err)
+		}
+	}
+
 	return cssFiles, jsFiles, nil
 }

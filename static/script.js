@@ -14,6 +14,38 @@ document.addEventListener('DOMContentLoaded', function() {
             .bindPopup(name).openPopup();
     }
 
+    mapDiv = document.getElementById('city-map');
+    if (mapDiv) {
+        // collect city data (all html elements with data-city)
+        var cityData = [];
+        document.querySelectorAll('[data-city]').forEach(function(cityEl) {
+            // skip elements without coordinates
+            if (!cityEl.dataset.lat || !cityEl.dataset.lon) return;
+            cityData.push({
+                url: cityEl.dataset.url,
+                name: cityEl.dataset.name,
+                clubs: cityEl.dataset.clubs,
+                lat: cityEl.dataset.lat,
+                lon: cityEl.dataset.lon
+            });
+        });
+        const germany = [
+            [50.913868, 5.603027],
+            [55.329144, 8.041992],
+            [50.999929, 15.227051],
+            [47.034162, 10.217285]
+        ];
+        var map = L.map('city-map').fitBounds(germany)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        cityData.forEach(function(city) {
+            L.marker([city.lat, city.lon]).addTo(map)
+                .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' Clubs)');
+        });
+    }
+
     // UMAMI
     document.querySelectorAll("a[target=_blank]").forEach((a) => {
         if (a.getAttribute("data-umami-event") === null) {

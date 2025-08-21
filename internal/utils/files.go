@@ -9,6 +9,11 @@ import (
 	"github.com/flopp/go-filehash"
 )
 
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
 func MakeDir(dir string) error {
 	// create directory if it doesn't exist
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

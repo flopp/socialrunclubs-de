@@ -13,8 +13,9 @@ import (
 )
 
 type City struct {
-	Name  string
-	Clubs []*Club
+	Name   string
+	Clubs  []*Club
+	Coords *utils.LatLon
 }
 
 func (c *City) Slug() string {
@@ -257,4 +258,19 @@ func GetData(config Config) (*Data, error) {
 	}
 
 	return data, nil
+}
+
+func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error {
+	for _, city := range data.Cities {
+		if city.Coords != nil {
+			continue
+		}
+		coords, err := geocoder.Lookup(city.Name)
+		if err != nil {
+			log.Panicf("getting coordinates for city %q: %w", city.Name, err)
+		} else {
+			city.Coords = &coords
+		}
+	}
+	return nil
 }

@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/flopp/socialrunclubs-de/internal/app"
+	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
 func main() {
@@ -22,6 +24,12 @@ func main() {
 	data, err := app.GetData(config)
 	if err != nil {
 		log.Fatalf("Error processing sheets: %v", err)
+	}
+
+	// annotate city coordinates
+	geocoder := utils.NewCachingGeocoder(utils.Download, fmt.Sprintf("%s/geocoder.json", config.CacheDir))
+	if err := app.AnnotateCityCoordinates(data, geocoder); err != nil {
+		log.Fatalf("Error annotating city coordinates: %v", err)
 	}
 
 	// copy static files to output directory

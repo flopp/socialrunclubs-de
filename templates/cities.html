@@ -5,7 +5,7 @@
 
     <ul>
         {{range .Data.Cities}}
-        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        <li data-city data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .Coords}}data-lat="{{.Coords.Lat}}" data-lon="{{.Coords.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
         {{end}}
     </ul>
 
@@ -15,6 +15,10 @@
     <div>
         <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
     </div>
+</section>
+
+</section>
+    <div id="city-map"></div>
 </section>
 
 {{template "footer.html" .}}

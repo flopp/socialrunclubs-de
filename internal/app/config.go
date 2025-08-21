@@ -9,6 +9,7 @@ import (
 type Config struct {
 	IsRemoteTarget bool
 	OutputDir      string
+	CacheDir       string
 	Google         struct {
 		APIKey    string
 		SheetId   string

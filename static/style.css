@@ -36,6 +36,12 @@ body>main {
     width: 100%;
 }
 
+
+#city-map {
+    height: 600px;
+    width: 100%;
+}
+
 .leaflet-container [role=button] {
     padding: 0px 0px;
 }

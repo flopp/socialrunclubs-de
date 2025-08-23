@@ -20,8 +20,8 @@ type City struct {
 }
 
 func (c *City) Show() bool {
-	// show 50 biggest cities & cities with run clubs
-	return c.SizeIndex <= 50 || len(c.Clubs) > 0
+	// show 60 biggest cities & cities with run clubs
+	return c.SizeIndex <= 60 || len(c.Clubs) > 0
 }
 
 func (c *City) Slug() string {

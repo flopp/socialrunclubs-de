@@ -175,6 +175,7 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	}
 
 	cities := make(map[string]struct{})
+	cityList := make([]string, 0)
 
 	for index, row := range sheet.Rows[1:] {
 		name := ""
@@ -188,6 +189,7 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 
 		if _, found := cities[name]; !found {
 			cities[name] = struct{}{}
+			cityList = append(cityList, name)
 		} else {
 			log.Printf("CITIES row %d: duplicate city name: %q", index+2, name)
 		}
@@ -201,16 +203,14 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	}
 
 	// add cities to data
-	sizeIndex := 1
-	for name := range cities {
+	for sizeIndex, name := range cityList {
 		if _, found := data.CityMap[name]; !found {
 			city := &City{
 				Name:      name,
-				SizeIndex: sizeIndex,
+				SizeIndex: sizeIndex + 1,
 			}
 			data.Cities = append(data.Cities, city)
 			data.CityMap[city.Name] = city
-			sizeIndex++
 		}
 	}
 

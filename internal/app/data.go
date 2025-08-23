@@ -13,9 +13,15 @@ import (
 )
 
 type City struct {
-	Name   string
-	Clubs  []*Club
-	Coords *utils.LatLon
+	Name      string
+	Clubs     []*Club
+	Coords    *utils.LatLon
+	SizeIndex int
+}
+
+func (c *City) Show() bool {
+	// show 50 biggest cities & cities with run clubs
+	return c.SizeIndex <= 50 || len(c.Clubs) > 0
 }
 
 func (c *City) Slug() string {
@@ -74,6 +80,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		return err
 	}
 
+	hasCities := len(data.Cities) > 0
 	for index, row := range sheet.Rows[1:] {
 		club := &Club{}
 
@@ -139,13 +146,71 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			city.Clubs = append(city.Clubs, club)
 			club.City = city
 		} else {
+			if hasCities {
+				log.Printf("CLUBS row %d: unknown city: %q", index+2, club.CityRaw)
+			}
 			city = &City{
-				Name:  club.CityRaw,
-				Clubs: []*Club{club},
+				Name:      club.CityRaw,
+				Clubs:     []*Club{club},
+				SizeIndex: 0,
 			}
 			data.Cities = append(data.Cities, city)
 			data.CityMap[city.Name] = city
 			club.City = city
+		}
+	}
+
+	return nil
+}
+
+func processCitiesSheet(sheet utils.Sheet, data *Data) error {
+	if len(sheet.Rows) == 0 {
+		return fmt.Errorf("sheet is empty")
+	}
+
+	required := []string{"NAME"}
+	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
+	if err != nil {
+		return err
+	}
+
+	cities := make(map[string]struct{})
+
+	for index, row := range sheet.Rows[1:] {
+		name := ""
+
+		if name, err = getVal("NAME", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if name == "" {
+			continue
+		}
+
+		if _, found := cities[name]; !found {
+			cities[name] = struct{}{}
+		} else {
+			log.Printf("CITIES row %d: duplicate city name: %q", index+2, name)
+		}
+	}
+
+	// if there are already city objects (from clubs), check the are all in the cities list
+	for _, city := range data.Cities {
+		if _, found := cities[city.Name]; !found {
+			log.Printf("CITIES: missing city from sheet: %q", city.Name)
+		}
+	}
+
+	// add cities to data
+	sizeIndex := 1
+	for name := range cities {
+		if _, found := data.CityMap[name]; !found {
+			city := &City{
+				Name:      name,
+				SizeIndex: sizeIndex,
+			}
+			data.Cities = append(data.Cities, city)
+			data.CityMap[city.Name] = city
+			sizeIndex++
 		}
 	}
 
@@ -170,12 +235,18 @@ func GetData(config Config) (*Data, error) {
 
 	// get the clubs and cities sheets
 	clubsFound := false
+	citiesFound := false
 	for _, sheet := range sheets {
 		switch sheet.Name {
 		case "CLUBS":
 			clubsFound = true
 			if err := processClubsSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing clubs sheet: %v", err)
+			}
+		case "CITIES":
+			citiesFound = true
+			if err := processCitiesSheet(sheet, data); err != nil {
+				return nil, fmt.Errorf("processing cities sheet: %v", err)
 			}
 		case "SUBMIT":
 			// ignore
@@ -191,6 +262,9 @@ func GetData(config Config) (*Data, error) {
 
 	if !clubsFound {
 		return nil, fmt.Errorf("missing clubs sheet")
+	}
+	if !citiesFound {
+		return nil, fmt.Errorf("missing cities sheet")
 	}
 
 	// sorting

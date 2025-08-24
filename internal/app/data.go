@@ -13,15 +13,15 @@ import (
 )
 
 type City struct {
-	Name      string
-	Clubs     []*Club
-	Coords    *utils.LatLon
-	SizeIndex int
+	Name                 string
+	Clubs                []*Club
+	Coords               *utils.LatLon
+	SizeIndexWithoutClub int
 }
 
 func (c *City) Show() bool {
-	// show 60 biggest cities & cities with run clubs
-	return c.SizeIndex <= 60 || len(c.Clubs) > 0
+	// show 10 biggest cities without clubs & cities with run clubs
+	return c.SizeIndexWithoutClub <= 10 || len(c.Clubs) > 0
 }
 
 func (c *City) Slug() string {
@@ -150,9 +150,9 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 				log.Printf("CLUBS row %d: unknown city: %q", index+2, club.CityRaw)
 			}
 			city = &City{
-				Name:      club.CityRaw,
-				Clubs:     []*Club{club},
-				SizeIndex: 0,
+				Name:                 club.CityRaw,
+				Clubs:                []*Club{club},
+				SizeIndexWithoutClub: 0,
 			}
 			data.Cities = append(data.Cities, city)
 			data.CityMap[city.Name] = city
@@ -203,14 +203,17 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	}
 
 	// add cities to data
-	for sizeIndex, name := range cityList {
+
+	indexWithoutClub := 1
+	for _, name := range cityList {
 		if _, found := data.CityMap[name]; !found {
 			city := &City{
-				Name:      name,
-				SizeIndex: sizeIndex + 1,
+				Name:                 name,
+				SizeIndexWithoutClub: indexWithoutClub,
 			}
 			data.Cities = append(data.Cities, city)
 			data.CityMap[city.Name] = city
+			indexWithoutClub++
 		}
 	}
 

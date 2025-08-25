@@ -115,6 +115,13 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			Template:    "cities.html",
 			OutFile:     "cities.html",
 		},
+		{
+			Title:       "Deutsche Städte ohne Social Run Clubs",
+			Description: "Eine Übersicht über alle Städte ohne Social Run Clubs.",
+			Canonical:   "/cities-no-club.html",
+			Template:    "cities-no-club.html",
+			OutFile:     "cities-no-club.html",
+		},
 	}
 	for _, page := range pages {
 		tdata := TemplateData{
@@ -141,6 +148,9 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 
 	// render city pages
 	for _, city := range data.Cities {
+		if len(city.Clubs) == 0 {
+			continue
+		}
 		tdata := TemplateData{
 			Data:           data,
 			City:           city,
@@ -184,6 +194,31 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			}
 			sitemapUrls = append(sitemapUrls, tdata.Canonical)
 		}
+	}
+	for _, city := range data.Cities {
+		if len(city.Clubs) != 0 {
+			continue
+		}
+		tdata := TemplateData{
+			Data:           data,
+			City:           city,
+			Club:           nil,
+			isRemoteTarget: config.IsRemoteTarget,
+			basePath:       config.OutputDir,
+			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
+			Description:    fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s.", city.Name),
+			Canonical:      canonical(city.Slug()),
+			SubmitUrl:      config.Google.SubmitUrl,
+			ReportUrl:      config.Google.ReportUrl,
+			CssFiles:       cssFiles,
+			JSFiles:        otherJS,
+			UmamiJS:        umamiJS,
+		}
+		fileName := filepath.Join(config.OutputDir, city.Slug(), "index.html")
+		if err := utils.ExecuteTemplate("city.html", fileName, tdata); err != nil {
+			return fmt.Errorf("rendering city template %q: %w", city.Name, err)
+		}
+		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 	}
 
 	// create sitemap.xml

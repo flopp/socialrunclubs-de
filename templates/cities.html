@@ -3,6 +3,10 @@
 <section>
     <h1>Deutsche Städte mit Social Run Clubs</h1>
 
+    <p>
+        Für folgende deutsche Städte haben wir mindestens einen Social Run Club gefunden:
+    </p>
+
     <ul>
         {{range .Data.Cities}} {{if .Clubs}}
         <li data-city data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .Coords}}data-lat="{{.Coords.Lat}}" data-lon="{{.Coords.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
@@ -11,10 +15,9 @@
 
     <p>
         Deine Stadt ist nicht mit dabei? Kein Problem, du kannst hier einen bestehenden Social Run Club in deiner Stadt hinzufügen:
-    </p>
-    <div>
+    
         <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
-    </div>
+    </p>
 
     <p>
         Wir haben auch eine Liste mit <a href="{{BasePath "/cities-no-club.html"}}">deutschen Städten ohne Social Run Clubs</a>.

@@ -342,9 +342,11 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 		if city.Coords != nil {
 			continue
 		}
-		if city.Show() == false {
-			continue
-		}
+		/*
+			if city.Show() == false {
+				continue
+			}
+		*/
 		coords, err := geocoder.Lookup(city.Name)
 		if err != nil {
 			log.Panicf("getting coordinates for city %q: %w", city.Name, err)

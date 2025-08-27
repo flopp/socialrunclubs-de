@@ -272,7 +272,7 @@ func GetData(config Config) (*Data, error) {
 
 	// sorting
 	sort.Slice(data.Cities, func(i, j int) bool {
-		return data.Cities[i].Name < data.Cities[j].Name
+		return data.Cities[i].Slug() < data.Cities[j].Slug()
 	})
 	for _, city := range data.Cities {
 		sort.Slice(city.Clubs, func(i, j int) bool {

@@ -16,6 +16,7 @@ type City struct {
 	Name                 string
 	Clubs                []*Club
 	Coords               *utils.LatLon
+	NearestCities        []*City
 	SizeIndexWithoutClub int
 }
 
@@ -378,6 +379,49 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 		} else {
 			city.Coords = &coords
 		}
+	}
+	return nil
+}
+
+func findNearestCities(city *City, cities []*City, maxResults int) []*City {
+	if city.Coords == nil {
+		return nil
+	}
+
+	type cityDistance struct {
+		city     *City
+		distance float64
+	}
+	var distances []cityDistance
+	for _, other := range cities {
+		if other == city {
+			continue
+		}
+		if other.Coords == nil {
+			continue
+		}
+		if len(other.Clubs) == 0 {
+			continue
+		}
+		distance := utils.Distance(*city.Coords, *other.Coords)
+		distances = append(distances, cityDistance{city: other, distance: distance})
+	}
+	sort.Slice(distances, func(i, j int) bool {
+		return distances[i].distance < distances[j].distance
+	})
+	if len(distances) > maxResults {
+		distances = distances[:maxResults]
+	}
+	var result []*City
+	for _, d := range distances {
+		result = append(result, d.city)
+	}
+	return result
+}
+
+func AnnotateNearestCities(data *Data) error {
+	for _, city := range data.Cities {
+		city.NearestCities = findNearestCities(city, data.Cities, 3)
 	}
 	return nil
 }

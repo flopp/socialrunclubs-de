@@ -31,6 +31,9 @@ func main() {
 	if err := app.AnnotateCityCoordinates(data, geocoder); err != nil {
 		log.Fatalf("Error annotating city coordinates: %v", err)
 	}
+	if err := app.AnnotateNearestCities(data); err != nil {
+		log.Fatalf("Error annotating nearest cities: %v", err)
+	}
 
 	// copy static files to output directory
 	cssFiles, jsFiles, err := app.CopyAssets(config)

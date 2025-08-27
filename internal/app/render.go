@@ -122,6 +122,13 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			Template:    "cities-no-club.html",
 			OutFile:     "cities-no-club.html",
 		},
+		{
+			Title:       "Alphabetische Liste deutscher Social Run Clubs",
+			Description: "Eine Übersicht über alle Social Run Clubs in Deutschland.",
+			Canonical:   "/clubs.html",
+			Template:    "clubs.html",
+			OutFile:     "clubs.html",
+		},
 	}
 	for _, page := range pages {
 		tdata := TemplateData{

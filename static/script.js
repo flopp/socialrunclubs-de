@@ -41,8 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
         cityData.forEach(function(city) {
+            const clubText = city.clubs == 1 ? 'Club' : 'Clubs';
             L.marker([city.lat, city.lon]).addTo(map)
-                .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' Clubs)');
+                .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' ' + clubText + ')');
         });
     }
 

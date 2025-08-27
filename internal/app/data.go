@@ -24,8 +24,12 @@ func (c *City) Show() bool {
 	return c.SizeIndexWithoutClub <= 10 || len(c.Clubs) > 0
 }
 
+func (c *City) SanitizeName() string {
+	return utils.SanitizeName(c.Name)
+}
+
 func (c *City) Slug() string {
-	return fmt.Sprintf("/%s", utils.SanitizeName(c.Name))
+	return fmt.Sprintf("/%s", c.SanitizeName())
 }
 
 type Club struct {
@@ -44,8 +48,12 @@ type Club struct {
 	StatusRaw      string
 }
 
+func (c *Club) SanitizeName() string {
+	return utils.SanitizeName(c.Name)
+}
+
 func (c *Club) Slug() string {
-	return fmt.Sprintf("/%s/%s", utils.SanitizeName(c.City.Name), utils.SanitizeName(c.Name))
+	return fmt.Sprintf("/%s/%s", c.City.SanitizeName(), c.SanitizeName())
 }
 
 type Data struct {
@@ -53,6 +61,7 @@ type Data struct {
 	NowStr      string
 	Cities      []*City
 	CityMap     map[string]*City
+	Clubs       []*Club
 	LatestClubs []*Club
 	TopCities   []*City
 	NumberClubs int
@@ -279,6 +288,22 @@ func GetData(config Config) (*Data, error) {
 			return city.Clubs[i].Slug() < city.Clubs[j].Slug()
 		})
 	}
+
+	// all clubs
+	data.Clubs = make([]*Club, 0)
+	for _, city := range data.Cities {
+		data.Clubs = append(data.Clubs, city.Clubs...)
+	}
+	sort.Slice(data.Clubs, func(i, j int) bool {
+		// sort by name + city name
+		n1 := data.Clubs[i].SanitizeName()
+		n2 := data.Clubs[j].SanitizeName()
+		if n1 != n2 {
+			return n1 < n2
+		}
+		// fallback to city
+		return data.Clubs[i].City.SanitizeName() < data.Clubs[j].City.SanitizeName()
+	})
 
 	// collect clubs by added date
 	var addedClubs []*Club

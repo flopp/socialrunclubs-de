@@ -134,6 +134,10 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			log.Printf("CLUBS row %d: empty city name: %q", index+2, club.CityRaw)
 			continue
 		}
+		if club.StatusRaw == "obsolete" {
+			//log.Printf("CLUBS row %d: obsolete club: %q", index+2, club.Name)
+			continue
+		}
 
 		// process data
 		descriptionHtml := template.HTML(club.DescriptionRaw)

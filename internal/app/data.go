@@ -352,7 +352,12 @@ func GetData(config Config) (*Data, error) {
 		}
 	}
 	sort.Slice(topCities, func(i, j int) bool {
-		return len(topCities[i].Clubs) > len(topCities[j].Clubs)
+		ic := len(topCities[i].Clubs)
+		jc := len(topCities[j].Clubs)
+		if ic != jc {
+			return ic > jc
+		}
+		return topCities[i].Name < topCities[j].Name
 	})
 	if len(topCities) > 5 {
 		data.TopCities = topCities[:5]

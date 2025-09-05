@@ -6,9 +6,11 @@
     <p>Hier findest du eine alphabetische Liste aller {{.Data.NumberClubs}} Social Run Clubs in Deutschland.<br>Ist dein Social Run Club nicht dabei? Kein Problem, du kannst hier einen bestehenden Club hinzufügen:</p>
     <p><a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a></p>
 
+    {{template "filter.html" .}}
+
     <ul>
         {{range .Data.Clubs}}
-        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        <li data-search="{{.Search}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
         {{end}}
     </ul>
 </section>

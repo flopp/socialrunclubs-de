@@ -9,9 +9,12 @@
     <p>
         <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
     </p>
+
+    {{template "filter.html" .}}
+
     <p>
         {{range .Data.Cities}} {{if not .Clubs}}
-        <a href="{{BasePath .Slug}}">{{.Name}}</a>
+        <a data-search="{{.Search}}" href="{{BasePath .Slug}}">{{.Name}}</a>
         {{end}}{{end}}
     </ul>
 </section>

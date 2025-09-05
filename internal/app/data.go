@@ -33,6 +33,10 @@ func (c *City) Slug() string {
 	return fmt.Sprintf("/%s", c.SanitizeName())
 }
 
+func (c *City) Search() string {
+	return strings.ToLower(c.Name)
+}
+
 type Club struct {
 	Name           string
 	DescriptionRaw string
@@ -55,6 +59,10 @@ func (c *Club) SanitizeName() string {
 
 func (c *Club) Slug() string {
 	return fmt.Sprintf("/%s/%s", c.City.SanitizeName(), c.SanitizeName())
+}
+
+func (c *Club) Search() string {
+	return strings.ToLower(fmt.Sprintf("%s %s", c.Name, c.City.Name))
 }
 
 type Data struct {

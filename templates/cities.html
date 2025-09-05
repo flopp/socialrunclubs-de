@@ -10,9 +10,10 @@
         <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
     </p>
 
+    {{template "filter.html" .}}
     <ul>
         {{range .Data.Cities}} {{if .Clubs}}
-        <li data-city data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .Coords}}data-lat="{{.Coords.Lat}}" data-lon="{{.Coords.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        <li data-city data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .Coords}}data-lat="{{.Coords.Lat}}" data-lon="{{.Coords.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
         {{end}}{{end}}
     </ul>
 

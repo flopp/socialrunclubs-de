@@ -4,10 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (filterInput) {
         filterInput.addEventListener('input', function() {
             var filter = filterInput.value.toLowerCase();
-            // iterate over all elements with "data-search"
-            // show/hide based on filter (fuzzy matching)
-            // show if filter is empty
-
             document.querySelectorAll('[data-search]').forEach(function(el) {
                 if (filter === '' || el.dataset.search.includes(filter)) {
                     el.style.display = '';

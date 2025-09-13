@@ -16,7 +16,7 @@
         {{range .Data.Cities}} {{if not .Clubs}}
         <a data-search="{{.Search}}" href="{{BasePath .Slug}}">{{.Name}}</a>
         {{end}}{{end}}
-    </ul>
+    </p>
 </section>
 
 {{template "footer.html" .}}

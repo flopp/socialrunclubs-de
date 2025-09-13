@@ -7,6 +7,13 @@
 
     <p>{{.Club.Description}}</p>
 
+    {{if .Club.Tags}}
+    <h2>Kategorien</h2>
+    <p>
+        {{range .Club.Tags}}<a href="{{BasePath .Slug}}">{{.Name}}</a>{{end}}
+    </p>
+    {{end}}
+
     <p>
         Weitere Informationen zu Club-Läufen, Terminen und Treffpunkten findest du hier:
     </p>

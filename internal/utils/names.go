@@ -54,3 +54,15 @@ func SanitizeName(s string) string {
 
 	return builder.String()
 }
+
+func SplitAndTrim(s, sep string) []string {
+	parts := strings.Split(s, sep)
+	var result []string
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			result = append(result, part)
+		}
+	}
+	return result
+}

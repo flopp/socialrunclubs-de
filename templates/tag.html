@@ -1,0 +1,24 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>Social Run Clubs der Kategorie {{.Tag.Name}}</h1>
+    <p>
+        Hier findest du alle Social Run Clubs in Deutschland, die der Kategorie "{{.Tag.Name}}" zugeordnet sind.
+    </p>
+
+    {{template "filter.html" .}}
+
+    <ul>
+        {{range .Tag.Clubs}}
+        <li data-search="{{.Search}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        {{end}}
+    </ul>
+    <p>
+        Dein Club ist nicht mit dabei? Kein Problem, du kannst ihn hier hinzufügen:
+    </p>
+    <p>
+        <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
+    </p>
+</section>
+
+{{template "footer.html" .}}

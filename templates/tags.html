@@ -1,0 +1,17 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>Social Run Club Kategorien</h1>
+
+    <p>
+        Hier findest du alle Kategorien von Social Run Clubs in Deutschland.
+    </p>
+
+    <ul>
+        {{range .Data.Tags}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        {{end}}
+    </ul>
+</section>
+
+{{template "footer.html" .}}

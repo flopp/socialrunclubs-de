@@ -37,10 +37,23 @@ func (c *City) Search() string {
 	return strings.ToLower(c.Name)
 }
 
+type Tag struct {
+	Name           string
+	DescriptionRaw string
+	Description    *template.HTML
+	Clubs          []*Club
+}
+
+func (t *Tag) Slug() string {
+	return fmt.Sprintf("/tag/%s", utils.SanitizeName(t.Name))
+}
+
 type Club struct {
 	Name           string
 	DescriptionRaw string
 	Description    *template.HTML
+	tagsRaw        []string
+	Tags           []*Tag
 	CityRaw        string
 	City           *City
 	LatLonRaw      string
@@ -70,11 +83,28 @@ type Data struct {
 	NowStr      string
 	Cities      []*City
 	CityMap     map[string]*City
+	Tags        []*Tag
+	TagMap      map[string]*Tag
 	Clubs       []*Club
 	LatestClubs []*Club
 	TopCities   []*City
 	NumberClubs int
 	Redirects   map[string]string
+}
+
+func (d *Data) getOrAddTag(name string) *Tag {
+	if d.TagMap == nil {
+		d.TagMap = make(map[string]*Tag)
+	}
+	if tag, found := d.TagMap[name]; found {
+		return tag
+	}
+	tag := &Tag{
+		Name: name,
+	}
+	d.Tags = append(d.Tags, tag)
+	d.TagMap[name] = tag
+	return tag
 }
 
 func (d *Data) redirect(from string, to string) {
@@ -100,7 +130,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		return fmt.Errorf("sheet is empty")
 	}
 
-	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
+	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
 	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
 	if err != nil {
 		return err
@@ -113,6 +143,14 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		if club.Name, err = getVal("NAME", row, colIdx); err != nil {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
+		if club.DescriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		tagsRaw := ""
+		if tagsRaw, err = getVal("TAGS", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		club.tagsRaw = utils.SplitAndTrim(tagsRaw, ",")
 		if club.DescriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
@@ -212,6 +250,14 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			data.Cities = append(data.Cities, city)
 			data.CityMap[city.Name] = city
 			club.City = city
+		}
+
+		// process tags
+		club.Tags = make([]*Tag, 0)
+		for _, tagName := range club.tagsRaw {
+			tag := data.getOrAddTag(tagName)
+			tag.Clubs = append(tag.Clubs, club)
+			club.Tags = append(club.Tags, tag)
 		}
 	}
 
@@ -325,13 +371,30 @@ func GetData(config Config) (*Data, error) {
 		return nil, fmt.Errorf("missing cities sheet")
 	}
 
-	// sorting
+	// sorting of cities
 	sort.Slice(data.Cities, func(i, j int) bool {
 		return data.Cities[i].Slug() < data.Cities[j].Slug()
 	})
 	for _, city := range data.Cities {
 		sort.Slice(city.Clubs, func(i, j int) bool {
 			return city.Clubs[i].Slug() < city.Clubs[j].Slug()
+		})
+	}
+
+	// sorting of tags
+	sort.Slice(data.Tags, func(i, j int) bool {
+		return data.Tags[i].Slug() < data.Tags[j].Slug()
+	})
+	for _, tag := range data.Tags {
+		sort.Slice(tag.Clubs, func(i, j int) bool {
+			// sort by name + city name
+			n1 := tag.Clubs[i].SanitizeName()
+			n2 := tag.Clubs[j].SanitizeName()
+			if n1 != n2 {
+				return n1 < n2
+			}
+			// fallback to city
+			return tag.Clubs[i].City.SanitizeName() < tag.Clubs[j].City.SanitizeName()
 		})
 	}
 

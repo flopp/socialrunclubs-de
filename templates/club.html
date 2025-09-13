@@ -5,11 +5,13 @@
 
     <p><em>{{.Club.Name}}</em> ist ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a></p>
 
-    <p>{{.Club.Description}}</p>
+    <p>
+        {{.Club.Description}}
+    </p>
 
     {{if .Club.Tags}}
-    <h2>Kategorien</h2>
     <p>
+        Kategorien:
         {{range .Club.Tags}}<a href="{{BasePath .Slug}}">{{.Name}}</a>{{end}}
     </p>
     {{end}}

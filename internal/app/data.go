@@ -38,14 +38,14 @@ func (c *City) Search() string {
 }
 
 type Tag struct {
-	Name           string
-	DescriptionRaw string
-	Description    *template.HTML
-	Clubs          []*Club
+	RawName     string
+	Name        string
+	Description *template.HTML
+	Clubs       []*Club
 }
 
 func (t *Tag) Slug() string {
-	return fmt.Sprintf("/tag/%s", utils.SanitizeName(t.Name))
+	return fmt.Sprintf("/tag/%s", utils.SanitizeName(t.RawName))
 }
 
 type Club struct {
@@ -100,7 +100,8 @@ func (d *Data) getOrAddTag(name string) *Tag {
 		return tag
 	}
 	tag := &Tag{
-		Name: name,
+		RawName: name,
+		Name:    name,
 	}
 	d.Tags = append(d.Tags, tag)
 	d.TagMap[name] = tag
@@ -321,6 +322,49 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	return nil
 }
 
+func processTagsSheet(sheet utils.Sheet, data *Data) error {
+	if len(sheet.Rows) == 0 {
+		return fmt.Errorf("sheet is empty")
+	}
+
+	required := []string{"NAME", "FANCY", "DESCRIPTION"}
+	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
+	if err != nil {
+		return err
+	}
+
+	for index, row := range sheet.Rows[1:] {
+		name := ""
+
+		if name, err = getVal("NAME", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if name == "" {
+			continue
+		}
+
+		fancy := ""
+		if fancy, err = getVal("FANCY", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if fancy == "" {
+			fancy = name
+		}
+
+		descriptionRaw := ""
+		if descriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		descriptionHtml := template.HTML(descriptionRaw)
+
+		tag := data.getOrAddTag(name)
+		tag.Name = fancy
+		tag.Description = &descriptionHtml
+	}
+
+	return nil
+}
+
 func GetData(config Config) (*Data, error) {
 	data := &Data{
 		Now:         time.Now(),
@@ -340,6 +384,7 @@ func GetData(config Config) (*Data, error) {
 	// get the clubs and cities sheets
 	clubsFound := false
 	citiesFound := false
+	tagsFound := false
 	for _, sheet := range sheets {
 		switch sheet.Name {
 		case "CLUBS":
@@ -351,6 +396,11 @@ func GetData(config Config) (*Data, error) {
 			citiesFound = true
 			if err := processCitiesSheet(sheet, data); err != nil {
 				return nil, fmt.Errorf("processing cities sheet: %v", err)
+			}
+		case "TAGS":
+			tagsFound = true
+			if err := processTagsSheet(sheet, data); err != nil {
+				return nil, fmt.Errorf("processing tags sheet: %v", err)
 			}
 		case "SUBMIT":
 			// ignore
@@ -369,6 +419,9 @@ func GetData(config Config) (*Data, error) {
 	}
 	if !citiesFound {
 		return nil, fmt.Errorf("missing cities sheet")
+	}
+	if !tagsFound {
+		return nil, fmt.Errorf("missing tags sheet")
 	}
 
 	// sorting of cities

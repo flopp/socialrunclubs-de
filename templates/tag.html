@@ -2,8 +2,11 @@
 
 <section>
     <h1>Social Run Clubs der Kategorie {{.Tag.Name}}</h1>
+
     <p>
         Hier findest du alle Social Run Clubs in Deutschland, die der Kategorie "{{.Tag.Name}}" zugeordnet sind.
+
+        <em>{{.Tag.Description}}</em>
     </p>
 
     {{template "filter.html" .}}

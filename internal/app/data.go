@@ -144,7 +144,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
 		if redirectName != "" && redirectCity != "" {
-			from := club.Slug()
+			from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
 			to := fmt.Sprintf("/%s/%s", utils.SanitizeName(redirectCity), utils.SanitizeName(redirectName))
 			if data.Redirects == nil {
 				data.Redirects = make(map[string]string)

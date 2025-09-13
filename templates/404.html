@@ -1,0 +1,19 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>404 - Seite nicht gefunden</h1>
+
+    <p>Die von dir angeforderte Seite konnte nicht gefunden werden.</p>
+
+    <h2>Hier ist eine Liste aller Social Run Clubs in unserer Datenbank:</h2>
+    
+    {{template "filter.html" .}}
+
+    <ul>
+        {{range .Data.Clubs}}
+        <li data-search="{{.Search}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        {{end}}
+    </ul>
+</section>
+
+{{template "footer.html" .}}

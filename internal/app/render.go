@@ -228,13 +228,37 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 	}
 
-	// create htaccess with redirects
-	htacessFile := filepath.Join(config.OutputDir, ".htaccess")
+	// render 404 page
+	tdata := TemplateData{
+		Data:           data,
+		City:           nil,
+		Club:           nil,
+		isRemoteTarget: config.IsRemoteTarget,
+		basePath:       config.OutputDir,
+		Title:          "404 - Seite nicht gefunden",
+		Description:    "Die von dir angeforderte Seite konnte nicht gefunden werden.",
+		Canonical:      canonical("/404.html"),
+		SubmitUrl:      config.Google.SubmitUrl,
+		ReportUrl:      config.Google.ReportUrl,
+		CssFiles:       cssFiles,
+		JSFiles:        otherJS,
+		UmamiJS:        umamiJS,
+	}
+	if err := utils.ExecuteTemplate("404.html", filepath.Join(config.OutputDir, "404.html"), tdata); err != nil {
+		return fmt.Errorf("rendering 404 template: %w", err)
+	}
+
+	// create htaccess with error page & redirects
+	htaccessFile := filepath.Join(config.OutputDir, ".htaccess")
 	htaccessData := make([]byte, 0)
+	// add 404 error document
+	htaccessData = append(htaccessData, []byte("ErrorDocument 404 /404.html\n")...)
+	htaccessData = append(htaccessData, []byte("\n")...)
+	// add redirects
 	for from, to := range data.Redirects {
 		htaccessData = append(htaccessData, []byte(fmt.Sprintf("Redirect 301 %s %s\n", from, to))...)
 	}
-	if err := os.WriteFile(htacessFile, htaccessData, 0644); err != nil {
+	if err := os.WriteFile(htaccessFile, htaccessData, 0644); err != nil {
 		return fmt.Errorf("writing htaccess file: %w", err)
 	}
 

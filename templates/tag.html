@@ -6,7 +6,8 @@
     <p>
         Hier findest du alle Social Run Clubs in Deutschland, die der Kategorie "{{.Tag.Name}}" zugeordnet sind.
 
-        <em>{{.Tag.Description}}</em>
+        {{if .Tag.Description}}<br><br>
+        <em>{{.Tag.Description}}</em>{{end}}
     </p>
 
     {{template "filter.html" .}}

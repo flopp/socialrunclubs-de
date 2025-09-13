@@ -228,6 +228,16 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 	}
 
+	// create htaccess with redirects
+	htacessFile := filepath.Join(config.OutputDir, ".htaccess")
+	htaccessData := make([]byte, 0)
+	for from, to := range data.Redirects {
+		htaccessData = append(htaccessData, []byte(fmt.Sprintf("Redirect 301 %s %s\n", from, to))...)
+	}
+	if err := os.WriteFile(htacessFile, htaccessData, 0644); err != nil {
+		return fmt.Errorf("writing htaccess file: %w", err)
+	}
+
 	// create sitemap.xml
 	sitemapFile := filepath.Join(config.OutputDir, "sitemap.xml")
 	sitemapData := make([]byte, 0)

@@ -77,6 +77,13 @@ type Data struct {
 	Redirects   map[string]string
 }
 
+func (d *Data) redirect(from string, to string) {
+	if d.Redirects == nil {
+		d.Redirects = make(map[string]string)
+	}
+	d.Redirects[from] = to
+}
+
 func getVal(colName string, row []string, colIdx map[string]int) (string, error) {
 	col, ok := colIdx[colName]
 	if !ok {
@@ -93,7 +100,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		return fmt.Errorf("sheet is empty")
 	}
 
-	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "CITY", "COORDS", "DESCRIPTION", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
+	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
 	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
 	if err != nil {
 		return err
@@ -134,29 +141,6 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
 
-		// redirects
-		redirectName := ""
-		redirectCity := ""
-		if redirectName, err = getVal("REDIRECT NAME", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if redirectCity, err = getVal("REDIRECT CITY", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if redirectName != "" && redirectCity != "" {
-			from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
-			to := fmt.Sprintf("/%s/%s", utils.SanitizeName(redirectCity), utils.SanitizeName(redirectName))
-			if data.Redirects == nil {
-				data.Redirects = make(map[string]string)
-			}
-			if existing, found := data.Redirects[from]; found {
-				log.Printf("CLUBS row %d: duplicate redirect from %q to %q (already to %q)", index+2, from, to, existing)
-			} else {
-				data.Redirects[from] = to
-			}
-			continue
-		}
-
 		// skip invalid clubs
 		if club.Name == "" {
 			log.Printf("CLUBS row %d: empty club name: %q", index+2, club.Name)
@@ -166,9 +150,34 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			log.Printf("CLUBS row %d: empty city name: %q", index+2, club.CityRaw)
 			continue
 		}
-		if club.StatusRaw == "obsolete" {
-			//log.Printf("CLUBS row %d: obsolete club: %q", index+2, club.Name)
+
+		if club.StatusRaw == "obsolete" || club.StatusRaw == "duplicate" {
+			// redirects
+			redirectName := ""
+			redirectCity := ""
+			if redirectName, err = getVal("REDIRECT NAME", row, colIdx); err != nil {
+				return fmt.Errorf("row %d: %v", index+2, err)
+			}
+			if redirectCity, err = getVal("REDIRECT CITY", row, colIdx); err != nil {
+				return fmt.Errorf("row %d: %v", index+2, err)
+			}
+			if redirectName != "" && redirectCity != "" {
+				from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
+				to := fmt.Sprintf("/%s/%s", utils.SanitizeName(redirectCity), utils.SanitizeName(redirectName))
+				data.redirect(from, to)
+			}
 			continue
+		}
+
+		// old name redirect
+		oldName := ""
+		if oldName, err = getVal("OLD NAME", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if oldName != "" {
+			from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(oldName))
+			to := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
+			data.redirect(from, to)
 		}
 
 		// process data

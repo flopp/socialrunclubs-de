@@ -12,7 +12,7 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="{{BasePath "/sitemap.xml"}}">
     {{range .CssFiles}}<link rel="stylesheet" href="{{BasePath .}}">
     {{end}}
-    {{if .IsRemoteTarget}}<script defer src="{{.UmamiJS}}" data-website-id="22294653-b924-4353-91a0-5abc871d5546"></script>{{end}}
+    {{if .Config.Umami.WebsiteId}}<script defer src="{{.UmamiJS}}" data-website-id="{{.Config.Umami.WebsiteId}}"></script>{{end}}
 </head>
 
 <body>

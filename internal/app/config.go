@@ -19,6 +19,9 @@ type Config struct {
 	AHrefs struct {
 		IndexNow string
 	}
+	Umami struct {
+		WebsiteId string
+	}
 }
 
 // loadConfig loads configuration from a JSON file into the given config struct.

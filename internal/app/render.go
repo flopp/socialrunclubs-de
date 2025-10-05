@@ -11,6 +11,7 @@ import (
 )
 
 type TemplateData struct {
+	Config         Config
 	isRemoteTarget bool
 	basePath       string
 	LastUpdate     string
@@ -140,6 +141,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 	}
 	for _, page := range pages {
 		tdata := TemplateData{
+			Config:         config,
 			Data:           data,
 			City:           nil,
 			Club:           nil,
@@ -167,6 +169,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			continue
 		}
 		tdata := TemplateData{
+			Config:         config,
 			Data:           data,
 			City:           city,
 			Club:           nil,
@@ -189,6 +192,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 
 		for _, club := range city.Clubs {
 			tdata := TemplateData{
+				Config:         config,
 				Data:           data,
 				City:           city,
 				Club:           club,
@@ -215,6 +219,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			continue
 		}
 		tdata := TemplateData{
+			Config:         config,
 			Data:           data,
 			City:           city,
 			Club:           nil,
@@ -238,6 +243,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 
 	for _, tag := range data.Tags {
 		tdata := TemplateData{
+			Config:         config,
 			Data:           data,
 			Tag:            tag,
 			isRemoteTarget: config.IsRemoteTarget,
@@ -260,6 +266,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 
 	// render 404 page
 	tdata := TemplateData{
+		Config:         config,
 		Data:           data,
 		City:           nil,
 		Club:           nil,

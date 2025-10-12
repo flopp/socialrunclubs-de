@@ -351,15 +351,16 @@ func processTagsSheet(sheet utils.Sheet, data *Data) error {
 			fancy = name
 		}
 
+		tag := data.getOrAddTag(name)
+		tag.Name = fancy
 		descriptionRaw := ""
 		if descriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
-		descriptionHtml := template.HTML(descriptionRaw)
-
-		tag := data.getOrAddTag(name)
-		tag.Name = fancy
-		tag.Description = &descriptionHtml
+		if len(descriptionRaw) > 0 {
+			descriptionHtml := template.HTML(descriptionRaw)
+			tag.Description = &descriptionHtml
+		}
 	}
 
 	return nil

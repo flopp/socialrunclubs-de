@@ -3,6 +3,11 @@
 <section>
     <h1>{{.Club.Name}}</h1>
 
+    <p class="btn-group">
+        <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}">Teilen</a>
+        <a role="button" class="secondary" href="{{.ReportLink}}" target="_blank">Fehler melden</a>
+    </p>
+
     <p><em>{{.Club.Name}}</em> ist ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a></p>
 
     <p>
@@ -33,16 +38,9 @@
         {{end}}
     </ul>
 
-
-
     {{if .Club.LatLon}}
     <div id="club-map" data-name="{{.Club.Name}}" data-lat="{{.Club.LatLon.Lat}}" data-lon="{{.Club.LatLon.Lon}}"></div>
     {{end}}
-
-    <p class="btn-group">
-        <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}">Teilen</a>
-        <a role="button" class="secondary" href="{{.ReportLink}}" target="_blank">Fehler melden</a>
-    </p>
 
     <small>
         (Hinzugefügt am: {{.Club.AddedRaw}}{{if .Club.UpdatedRaw}}, aktualisiert am: {{.Club.UpdatedRaw}}{{end}})

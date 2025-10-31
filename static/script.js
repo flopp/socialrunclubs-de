@@ -62,6 +62,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // SHARE
+    document.querySelectorAll('[data-share]').forEach(function(shareBtn) {
+        var url = shareBtn.dataset.url || window.location.href;
+        var title = shareBtn.dataset.title || document.title;
+        var data = {
+            title: title,
+            url: url + "?utm_source=share_button"
+        };
+
+        if (navigator.canShare === undefined || !navigator.canShare(data)) {
+            // hide button
+            shareBtn.style.display = 'none';
+            return;
+        }
+
+        shareBtn.setAttribute('data-umami-event', 'share-click');
+        shareBtn.setAttribute('data-umami-event-url', data.url);
+        shareBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await navigator.share(data);
+            } catch (error) {
+                console.error("Error sharing:", error);
+            }
+        });
+    });
+
     // UMAMI
     document.querySelectorAll("a[target=_blank]").forEach((a) => {
         if (a.getAttribute("data-umami-event") === null) {

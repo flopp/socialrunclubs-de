@@ -33,20 +33,20 @@
         {{end}}
     </ul>
 
+
+
     {{if .Club.LatLon}}
     <div id="club-map" data-name="{{.Club.Name}}" data-lat="{{.Club.LatLon.Lat}}" data-lon="{{.Club.LatLon.Lon}}"></div>
     {{end}}
 
+    <p class="btn-group">
+        <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}">Teilen</a>
+        <a role="button" class="secondary" href="{{.ReportLink}}" target="_blank">Fehler melden</a>
+    </p>
+
     <small>
         (Hinzugefügt am: {{.Club.AddedRaw}}{{if .Club.UpdatedRaw}}, aktualisiert am: {{.Club.UpdatedRaw}}{{end}})
     </small>
-
-    <p>
-        Sind die Informationen fehlerhaft oder gibt es ein anderes Problem mit diesem Eintrag?
-    </p>
-    <div>
-        <a role="button" href="{{.ReportLink}}" target="_blank">Fehler melden</a>
-    </div>
 </section>
 
 {{template "footer.html" .}}

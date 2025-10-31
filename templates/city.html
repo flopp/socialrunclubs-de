@@ -3,6 +3,10 @@
 <section>
     <h1>Social Run Clubs in {{.City.Name}}</h1>
 
+    <p class="btn-group">
+        <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}">Seite Teilen</a>
+    </p>
+
     {{if .City.Clubs}}
     <p>
         Im {{.City.Name}} gibt es folgende Social Run Clubs, offene Lauftreffs und Laufgruppen:

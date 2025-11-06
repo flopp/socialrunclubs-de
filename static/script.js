@@ -77,10 +77,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        shareBtn.setAttribute('data-umami-event', 'share-click');
-        shareBtn.setAttribute('data-umami-event-url', data.url);
         shareBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            if (document.umami !== undefined) {
+                document.umami.track('share-click', {url: data.url});
+            }
             try {
                 await navigator.share(data);
             } catch (error) {

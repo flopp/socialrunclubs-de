@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         shareBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (document.umami !== undefined) {
-                document.umami.track('share-click', {url: data.url});
+            if (window.umami !== undefined) {
+                window.umami.track('share-click', {url: data.url});
             }
             try {
                 await navigator.share(data);

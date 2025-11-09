@@ -19,6 +19,11 @@ run-local:
 .repo/.git/config:
 	git clone https://github.com/flopp/socialrunclubs-de.git .repo
 
+.phony: backup
+backup:
+	@mkdir -p backup-data
+	@go run cmd/backup/main.go -config production.json -output backup-data/$(shell date +%Y-%m-%d).ods
+
 .phony: sync
 sync: .repo/.git/config .bin/generate-linux
 	(cd .repo && git pull --quiet)

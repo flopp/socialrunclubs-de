@@ -22,7 +22,7 @@ type City struct {
 }
 
 func (c *City) MetaDescription() string {
-	desc := fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s", c.Name)
+	desc := fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s. ", c.Name)
 	if len(c.Clubs) == 0 {
 		desc += "Aktuell gibt es leider keine Einträge für diese Stadt. Du kannst aber gerne einen neuen Club hinzufügen!"
 	} else if len(c.Clubs) == 1 {
@@ -32,7 +32,7 @@ func (c *City) MetaDescription() string {
 		for _, club := range c.Clubs {
 			clubNames = append(clubNames, club.Name)
 		}
-		desc += fmt.Sprintf("Aktuell gibt es %d: %s", len(c.Clubs))
+		desc += fmt.Sprintf("Aktuell gibt es %d Einträge:", len(c.Clubs))
 		for i, name := range clubNames {
 			if len(desc) >= 160 {
 				desc += "..."

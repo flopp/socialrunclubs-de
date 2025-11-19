@@ -10,6 +10,19 @@
     <meta name="description" content="{{.Description}}">
     <link rel="canonical" href="{{.Canonical}}">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="{{BasePath "/sitemap.xml"}}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{.Canonical}}">
+    <meta property="og:title" content="{{.Title}} - socialrunclubs.de">
+    <meta property="og:description" content="{{.Description}}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="{{.Canonical}}">
+    <meta property="twitter:title" content="{{.Title}} - socialrunclubs.de">
+    <meta property="twitter:description" content="{{.Description}}">
+
     {{range .CssFiles}}<link rel="stylesheet" href="{{BasePath .}}">
     {{end}}
     {{if .Config.Umami.WebsiteId}}<script defer src="{{.UmamiJS}}" data-website-id="{{.Config.Umami.WebsiteId}}"></script>{{end}}

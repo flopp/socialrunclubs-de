@@ -35,6 +35,13 @@
         <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
         {{end}}
     </ul>
+
+    <h2>Nächste Städte ohne Social Run Clubs:</h2>
+    <ul>
+        {{range .City.NearestCitiesNoClub}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
+        {{end}}
+    </ul>
 </section>
 
 {{template "footer.html" .}}

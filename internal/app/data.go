@@ -17,7 +17,35 @@ type City struct {
 	Clubs                []*Club
 	Coords               *utils.LatLon
 	NearestCities        []*City
+	NearestCitiesNoClub  []*City
 	SizeIndexWithoutClub int
+}
+
+func (c *City) MetaDescription() string {
+	desc := fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s", c.Name)
+	if len(c.Clubs) == 0 {
+		desc += "Aktuell gibt es leider keine Einträge für diese Stadt. Du kannst aber gerne einen neuen Club hinzufügen!"
+	} else if len(c.Clubs) == 1 {
+		desc += fmt.Sprintf("Aktuell gibt es einen Eintrag: %s", c.Clubs[0].Name)
+	} else {
+		clubNames := make([]string, 0, len(c.Clubs))
+		for _, club := range c.Clubs {
+			clubNames = append(clubNames, club.Name)
+		}
+		desc += fmt.Sprintf("Aktuell gibt es %d: %s", len(c.Clubs))
+		for i, name := range clubNames {
+			if len(desc) >= 160 {
+				desc += "..."
+				break
+			}
+			if i == 0 {
+				desc += " " + name
+			} else {
+				desc += ", " + name
+			}
+		}
+	}
+	return desc
 }
 
 func (c *City) Show() bool {
@@ -64,6 +92,17 @@ type Club struct {
 	AddedRaw       string
 	UpdatedRaw     string
 	StatusRaw      string
+}
+
+func (c *Club) MetaDescription() string {
+	desc := fmt.Sprintf("Informationen und Links zum Social Run Club '%s' in %s", c.Name, c.City.Name)
+	if c.Description != nil {
+		desc += " - " + strings.ReplaceAll(string(*c.Description), "<br>", "; ")
+		if len(desc) > 160 {
+			desc = desc[:157] + "..."
+		}
+	}
+	return desc
 }
 
 func (c *Club) SanitizeName() string {
@@ -550,7 +589,7 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 	return nil
 }
 
-func findNearestCities(city *City, cities []*City, maxResults int) []*City {
+func findNearestCities(city *City, cities []*City, maxResults int, withClubs bool) []*City {
 	if city.Coords == nil {
 		return nil
 	}
@@ -567,9 +606,13 @@ func findNearestCities(city *City, cities []*City, maxResults int) []*City {
 		if other.Coords == nil {
 			continue
 		}
-		if len(other.Clubs) == 0 {
+		if withClubs && len(other.Clubs) == 0 {
 			continue
 		}
+		if !withClubs && len(other.Clubs) != 0 {
+			continue
+		}
+
 		distance := utils.Distance(*city.Coords, *other.Coords)
 		distances = append(distances, cityDistance{city: other, distance: distance})
 	}
@@ -588,7 +631,8 @@ func findNearestCities(city *City, cities []*City, maxResults int) []*City {
 
 func AnnotateNearestCities(data *Data) error {
 	for _, city := range data.Cities {
-		city.NearestCities = findNearestCities(city, data.Cities, 3)
+		city.NearestCities = findNearestCities(city, data.Cities, 3, true)
+		city.NearestCitiesNoClub = findNearestCities(city, data.Cities, 3, false)
 	}
 	return nil
 }

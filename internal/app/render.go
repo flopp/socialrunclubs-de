@@ -44,6 +44,10 @@ func (t TemplateData) ReportLink() string {
 	return strings.ReplaceAll(t.ReportUrl, "NAME", encodedCanonical)
 }
 
+func FillDDescription(description string) string {
+	return description
+}
+
 func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 	umamiJS := ""
 	otherJS := make([]string, 0)
@@ -176,7 +180,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			isRemoteTarget: config.IsRemoteTarget,
 			basePath:       config.OutputDir,
 			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
-			Description:    fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s.", city.Name),
+			Description:    city.MetaDescription(),
 			Canonical:      canonical(city.Slug()),
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,
@@ -199,7 +203,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 				isRemoteTarget: config.IsRemoteTarget,
 				basePath:       config.OutputDir,
 				Title:          fmt.Sprintf("%s - ein Social Run Club in %s", club.Name, city.Name),
-				Description:    fmt.Sprintf("Informationen und Links zum Social Run Club '%s' in %s.", club.Name, city.Name),
+				Description:    club.MetaDescription(),
 				Canonical:      canonical(club.Slug()),
 				SubmitUrl:      config.Google.SubmitUrl,
 				ReportUrl:      config.Google.ReportUrl,

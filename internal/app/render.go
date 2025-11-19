@@ -230,7 +230,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			isRemoteTarget: config.IsRemoteTarget,
 			basePath:       config.OutputDir,
 			Title:          fmt.Sprintf("Social Run Clubs in %s", city.Name),
-			Description:    fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s.", city.Name),
+			Description:    city.MetaDescription(),
 			Canonical:      canonical(city.Slug()),
 			SubmitUrl:      config.Google.SubmitUrl,
 			ReportUrl:      config.Google.ReportUrl,

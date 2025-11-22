@@ -22,6 +22,7 @@ type City struct {
 }
 
 func (c *City) MetaDescription() string {
+	maxLength := 160
 	desc := fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in %s. ", c.Name)
 	if len(c.Clubs) == 0 {
 		desc += "Aktuell gibt es leider keine Einträge für diese Stadt. Du kannst aber gerne einen neuen Club hinzufügen!"
@@ -34,8 +35,8 @@ func (c *City) MetaDescription() string {
 		}
 		desc += fmt.Sprintf("Aktuell gibt es %d Einträge:", len(c.Clubs))
 		for i, name := range clubNames {
-			if len(desc) >= 160 {
-				desc += "..."
+			if len(desc)+len(name)+2 >= maxLength {
+				desc += "…"
 				break
 			}
 			if i == 0 {
@@ -95,11 +96,12 @@ type Club struct {
 }
 
 func (c *Club) MetaDescription() string {
+	maxLength := 160
 	desc := fmt.Sprintf("Informationen und Links zum Social Run Club '%s' in %s", c.Name, c.City.Name)
 	if c.Description != nil {
 		desc += " - " + strings.ReplaceAll(string(*c.Description), "<br>", "; ")
-		if len(desc) > 160 {
-			desc = desc[:157] + "..."
+		if len(desc) > maxLength {
+			desc = desc[:maxLength-2] + "…"
 		}
 	}
 	return desc
@@ -581,7 +583,7 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 		*/
 		coords, err := geocoder.Lookup(city.Name)
 		if err != nil {
-			log.Panicf("getting coordinates for city %q: %w", city.Name, err)
+			log.Panicf("getting coordinates for city %q: %v", city.Name, err)
 		} else {
 			city.Coords = &coords
 		}

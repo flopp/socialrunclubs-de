@@ -8,10 +8,12 @@
     <h2>Was ist das hier?</h2>
     <p>
         Diese Seite sammelt Informationen über alle Social Run Clubs in Deutschland. Momentan listen wir {{.Data.NumberClubs}} Social Run Clubs.<br />
-        Auf der <a href="{{BasePath "/clubs.html"}}">Clubs-Seite</a> ("Clubs" in der Kopfzeile) findest du eine Übersicht aller Social Run Clubs (alphabetisch sortiert).<br />
-        Auf der <a href="{{BasePath "/cities.html"}}">Städte-Seite</a> ("Städte" in der Kopfzeile) findest du eine Übersicht aller Städte mit Social Run Clubs.<br />
-        Mit unserem <a href="{{.SubmitUrl}}" target="_blank">Formular</a> ("Eintragen" in der Kopfzeile) kannst du einen neuen Social Run Club hinzufügen.
     </p>
+    <div class="grid">
+        <article>Auf der <a href="{{BasePath "/clubs.html"}}">Clubs-Seite</a> ("Clubs" in der Kopfzeile) findest du eine Übersicht aller Social Run Clubs (alphabetisch sortiert).</article>
+        <article>Auf der <a href="{{BasePath "/cities.html"}}">Städte-Seite</a> ("Städte" in der Kopfzeile) findest du eine Übersicht aller Städte mit Social Run Clubs.</article>
+        <article>Mit unserem <a href="{{.SubmitUrl}}" target="_blank">Formular</a> ("Eintragen" in der Kopfzeile) kannst du einen neuen Social Run Club hinzufügen.</article>
+    </div>
 </section>
 
 <section>

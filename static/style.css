@@ -19,6 +19,22 @@ body>main {
     flex-grow: 1;
 }
 
+header, footer {
+    background-color: #f2f2ff;
+}
+.twoline-nav {
+    display: flex;
+    flex-direction: row;
+}
+@media (max-width: 768px) {
+    .twoline-nav {
+        flex-direction: column;
+    }
+    .twoline-nav li {
+        padding-bottom: 0;
+    }
+}
+
 .icon-primary {
     background: var(--pico-primary-background);
 }

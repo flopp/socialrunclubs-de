@@ -32,12 +32,16 @@
 
 <body>
     <header>
-        <div class="container">
-            <a href="{{BasePath "/"}}" style="text-decoration: none;">
-                <img src="{{BasePath "/favicon.svg"}}" alt="socialrunclubs.de Logo" style="width: 1.5em; height: 1.5em;">
-                <b style="font-size: 1.5em; vertical-align: middle;">Social Run Clubs</b>
-            </a>
-            <nav>
+        <div class="container" style="display: block">
+            <nav class="twoline-nav">
+                <ul>
+                    <li>
+                        <a href="{{BasePath "/"}}" style="text-decoration: none;">
+                            <img src="{{BasePath "/favicon.svg"}}" alt="socialrunclubs.de Logo" style="width: 1.5em; height: 1.5em;">
+                            <b style="font-size: 1.5em; vertical-align: middle;">Social Run Clubs</b>
+                        </a>
+                    </li>
+                </ul>
                 <ul>
                     <li><a href="{{BasePath "/clubs.html"}}">Clubs</a></li>
                     <li><a href="{{BasePath "/cities.html"}}">Städte</a></li>

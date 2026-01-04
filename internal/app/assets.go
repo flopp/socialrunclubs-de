@@ -79,6 +79,19 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	}
 	cssFiles = append(cssFiles, markerClusterCSS)
 
+	// leaflet gesture handling
+	gestureHandlingJS, err := download("https://raw.githubusercontent.com/elmarquis/Leaflet.GestureHandling/refs/heads/master/dist/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.js: %w", err)
+	}
+	jsFiles = append(jsFiles, gestureHandlingJS)
+
+	gestureHandlingCSS, err := download("https://raw.githubusercontent.com/elmarquis/Leaflet.GestureHandling/refs/heads/master/dist/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.css: %w", err)
+	}
+	cssFiles = append(cssFiles, gestureHandlingCSS)
+
 	// umami
 	umamiJS, err := download("https://cloud.umami.is/script.js", "static/umami.HASH.js", config)
 	if err != nil {

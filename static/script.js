@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         clusterData.forEach(function(club) {
             var marker = L.marker([club[0], club[1]])
-                .bindPopup('<a href="' + club[3] + '">' + club[2] + '</a>');
+                .bindPopup('<a href="' + club[4] + '">' + club[2] + '</a><br>in ' + club[3]);
             markers.addLayer(marker);
         });
         var map = L.map('cluster-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);

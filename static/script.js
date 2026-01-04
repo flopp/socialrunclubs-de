@@ -15,22 +15,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // MAPS
+    const germany = [
+        [50.913868, 5.603027],
+        [55.329144, 8.041992],
+        [50.999929, 15.227051],
+        [47.034162, 10.217285]
+    ];
+    var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    
     var mapDiv = document.getElementById('club-map');
     if (mapDiv) {
         var lat = parseFloat(mapDiv.dataset.lat);
         var lon = parseFloat(mapDiv.dataset.lon);
         var name = mapDiv.dataset.name;
         var map = L.map('club-map').setView([lat, lon], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        baseLayer.addTo(map);
         L.marker([lat, lon]).addTo(map)
             .bindPopup(name).openPopup();
     }
 
-    mapDiv = document.getElementById('city-map');
-    if (mapDiv) {
+    if (document.getElementById('city-map')) {
         var markers = L.layerGroup();
         document.querySelectorAll('[data-search]').forEach(function(cityEl) {
             var city = {
@@ -44,17 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var marker = L.marker([city.lat, city.lon])
                 .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' ' + clubText + ')');
             markers.addLayer(marker);
-        });
-
-        const germany = [
-            [50.913868, 5.603027],
-            [55.329144, 8.041992],
-            [50.999929, 15.227051],
-            [47.034162, 10.217285]
-        ];
-        var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         });
         var map = L.map('city-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
     }
@@ -73,18 +69,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 .bindPopup('<a href="' + club.url + '">' + club.name + '</a>');
             markers.addLayer(marker);
         });
-
-        const germany = [
-            [50.913868, 5.603027],
-            [55.329144, 8.041992],
-            [50.999929, 15.227051],
-            [47.034162, 10.217285]
-        ];
-        var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        });
         var map = L.map('clubs-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+    }
+
+    if (document.getElementById('cluster-map')) {
+        var markers = L.markerClusterGroup();
+
+        clusterData.forEach(function(club) {
+            var marker = L.marker([club[0], club[1]])
+                .bindPopup('<a href="' + club[3] + '">' + club[2] + '</a>');
+            markers.addLayer(marker);
+        });
+        var map = L.map('cluster-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
     }
 
     // SHARE

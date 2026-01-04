@@ -17,6 +17,13 @@
 </section>
 
 <section>
+    <div id="cluster-map" class="big-map"></div>
+    <script>
+        var clusterData = [{{range .Data.Clubs}}[{{if .LatLon}}{{.LatLon.Lat}},{{.LatLon.Lon}}{{else}}{{.City.Coords.Lat}}, {{.City.Coords.Lon}}{{end}},"{{.Name}}","{{.City.Name}}","{{BasePath .Slug}}"],{{end}}];
+    </script>
+</section>
+
+<section>
     <h2>Letzte Änderungen</h2>
     <p>
         Hier sind die Clubs, die zuletzt hinzugefügt wurden:

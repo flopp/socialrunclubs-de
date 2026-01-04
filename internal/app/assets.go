@@ -66,6 +66,19 @@ func CopyAssets(config Config) ([]string, []string, error) {
 		return nil, nil, fmt.Errorf("download marker-shadow.png: %w", err)
 	}
 
+	// leaflet marker cluster
+	markerClusterJS, err := download("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js", "static/marker-cluster.HASH.js", config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("download marker-cluster.js: %w", err)
+	}
+	jsFiles = append(jsFiles, markerClusterJS)
+
+	markerClusterCSS, err := download("https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("download marker-cluster.css: %w", err)
+	}
+	cssFiles = append(cssFiles, markerClusterCSS)
+
 	// umami
 	umamiJS, err := download("https://cloud.umami.is/script.js", "static/umami.HASH.js", config)
 	if err != nil {

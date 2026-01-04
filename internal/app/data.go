@@ -588,6 +588,7 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 			city.Coords = &coords
 		}
 	}
+
 	return nil
 }
 

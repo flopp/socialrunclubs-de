@@ -31,35 +31,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     mapDiv = document.getElementById('city-map');
     if (mapDiv) {
-        // collect city data (all html elements with data-city)
-        var cityData = [];
-        document.querySelectorAll('[data-city]').forEach(function(cityEl) {
-            // skip elements without coordinates
-            if (!cityEl.dataset.lat || !cityEl.dataset.lon) return;
-            cityData.push({
+        var markers = L.layerGroup();
+        document.querySelectorAll('[data-search]').forEach(function(cityEl) {
+            var city = {
                 url: cityEl.dataset.url,
                 name: cityEl.dataset.name,
                 clubs: cityEl.dataset.clubs,
                 lat: cityEl.dataset.lat,
                 lon: cityEl.dataset.lon
-            });
+            };
+            const clubText = city.clubs == 1 ? 'Club' : 'Clubs';
+            var marker = L.marker([city.lat, city.lon])
+                .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' ' + clubText + ')');
+            markers.addLayer(marker);
         });
+
         const germany = [
             [50.913868, 5.603027],
             [55.329144, 8.041992],
             [50.999929, 15.227051],
             [47.034162, 10.217285]
         ];
-        var map = L.map('city-map').fitBounds(germany)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-        cityData.forEach(function(city) {
-            const clubText = city.clubs == 1 ? 'Club' : 'Clubs';
-            L.marker([city.lat, city.lon]).addTo(map)
-                .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' ' + clubText + ')');
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         });
+        var map = L.map('city-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+    }
+
+    if (document.getElementById('clubs-map')) {
+        //var markers = L.markerClusterGroup();
+        var markers = L.layerGroup();
+        document.querySelectorAll('[data-search]').forEach(function(clubEl) {
+            var club = {
+                name: clubEl.dataset.name,
+                lat: parseFloat(clubEl.dataset.lat),
+                lon: parseFloat(clubEl.dataset.lon),
+                url: clubEl.dataset.url
+            };
+            var marker = L.marker([club.lat, club.lon])
+                .bindPopup('<a href="' + club.url + '">' + club.name + '</a>');
+            markers.addLayer(marker);
+        });
+
+        const germany = [
+            [50.913868, 5.603027],
+            [55.329144, 8.041992],
+            [50.999929, 15.227051],
+            [47.034162, 10.217285]
+        ];
+        var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        var map = L.map('clubs-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
     }
 
     // SHARE

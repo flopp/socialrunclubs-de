@@ -94,8 +94,7 @@ header, footer {
     width: 100%;
 }
 
-
-#city-map {
+.big-map {
     height: 600px;
     width: 100%;
 }
@@ -108,4 +107,8 @@ header, footer {
     border: none;
     background-color: transparent;
     padding: 0px 0px;
+}
+
+.marker-cluster {
+    color: black;
 }

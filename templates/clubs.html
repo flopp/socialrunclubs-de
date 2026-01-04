@@ -10,9 +10,11 @@
 
     <ul>
         {{range .Data.Clubs}}
-        <li data-search="{{.Search}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        <li data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.Coords.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.Coords.Lon}}{{end}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
         {{end}}
     </ul>
+
+    <div id="clubs-map" class="big-map"></div>
 </section>
 
 {{template "footer.html" .}}

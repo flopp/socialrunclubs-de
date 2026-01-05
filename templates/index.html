@@ -10,9 +10,24 @@
         Diese Seite sammelt Informationen über alle Social Run Clubs in Deutschland. Momentan listen wir {{.Data.NumberClubs}} Social Run Clubs.<br />
     </p>
     <div class="grid">
-        <article>Auf der <a href="{{BasePath "/clubs.html"}}">Clubs-Seite</a> ("Clubs" in der Kopfzeile) findest du eine Übersicht aller Social Run Clubs (alphabetisch sortiert).</article>
-        <article>Auf der <a href="{{BasePath "/cities.html"}}">Städte-Seite</a> ("Städte" in der Kopfzeile) findest du eine Übersicht aller Städte mit Social Run Clubs.</article>
-        <article>Mit unserem <a href="{{.SubmitUrl}}" target="_blank">Formular</a> ("Eintragen" in der Kopfzeile) kannst du einen neuen Social Run Club hinzufügen.</article>
+        <article>
+            <p>Auf der <a href="{{BasePath "/clubs.html"}}">Clubs-Seite</a> ("Clubs" in der Kopfzeile) findest du eine Übersicht aller Social Run Clubs (alphabetisch sortiert).</p>
+            <p class="btn-group">
+                <a role="button" href="{{BasePath "/clubs.html"}}">Zu den Clubs</a>
+            </p>
+        </article>
+        <article>
+            <p>Auf der <a href="{{BasePath "/cities.html"}}">Städte-Seite</a> ("Städte" in der Kopfzeile) findest du eine Übersicht aller Städte mit Social Run Clubs.</p>
+            <p class="btn-group">
+                <a role="button" href="{{BasePath "/cities.html"}}">Zu den Städten</a>
+            </p>
+        </article>
+        <article>
+            <p>Mit unserem <a href="{{.SubmitUrl}}" target="_blank">Formular</a> ("Eintragen" in der Kopfzeile) kannst du einen neuen Social Run Club hinzufügen.</p>
+            <p class="btn-group">
+                <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Eintragen</a>
+            </p>
+        </article>
     </div>
 </section>
 

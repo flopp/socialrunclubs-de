@@ -25,6 +25,8 @@
     <meta property="twitter:description" content="{{.Description}}">
     <meta property="twitter:image" content="https://socialrunclubs.de/logo.svg" />
 
+    <!-- AWIN (not yet) -->
+
     {{range .CssFiles}}<link rel="stylesheet" href="{{BasePath .}}">
     {{end}}
     {{if .Config.Umami.WebsiteId}}<script defer src="{{.UmamiJS}}" data-website-id="{{.Config.Umami.WebsiteId}}"></script>{{end}}
@@ -47,7 +49,7 @@
                     <li><a href="{{BasePath "/cities.html"}}">Städte</a></li>
                     <li><a href="{{BasePath "/tags.html"}}">Kategorien</a></li>
                     <li><a href="https://www.instagram.com/socialrunclubs/" target="_blank"><span class="insta-icon icon-primary"> </span></a></li>
-                    <li><a href="{{.SubmitUrl}}" target="_blank"><button>Eintragen</button></a></li>
+                    <li><a href="{{.SubmitUrl}}" target="_blank"><button><span class="plus-icon icon-white"> </span> Eintragen</button></a></li>
                 </ul>
             </nav>
         </div>

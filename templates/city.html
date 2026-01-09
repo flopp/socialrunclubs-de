@@ -30,24 +30,23 @@
             <p>
                 <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
             </p>
-
-            <h2>Nächste Städte mit Social Run Clubs:</h2>
-            <ul>
-                {{range .City.NearestCities}}
-                <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
-                {{end}}
-            </ul>
-
-            <h2>Nächste Städte ohne Social Run Clubs:</h2>
-            <ul>
-                {{range .City.NearestCitiesNoClub}}
-                <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
-                {{end}}
-            </ul>
         </div>
         {{template "affiliate.html" .}}
     </div>
 
+    <h2>Nächste Städte mit Social Run Clubs:</h2>
+    <ul>
+        {{range .City.NearestCities}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        {{end}}
+    </ul>
+
+    <h2>Nächste Städte ohne Social Run Clubs:</h2>
+    <ul>
+        {{range .City.NearestCitiesNoClub}}
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
+        {{end}}
+    </ul>
 </section>
 
 {{template "footer.html" .}}

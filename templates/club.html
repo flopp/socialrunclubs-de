@@ -2,41 +2,41 @@
 
 <section>
     <h1>{{.Club.Name}}</h1>
-
     <p class="btn-group">
         <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}"><span class="share-icon icon-white"> </span> Teilen</a>
         <a role="button" class="secondary" href="{{.ReportLink}}" target="_blank"><span class="issue-icon icon-white"> </span> Fehler melden</a>
     </p>
-
-    <p><em>{{.Club.Name}}</em> ist ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a></p>
-
-    <p>
-        {{.Club.Description}}
-    </p>
-
-    {{if .Club.Tags}}
-    <p>
-        Kategorien:
-        <ul>
-            {{range .Club.Tags}}<li><a href="{{BasePath .Slug}}">{{.Name}}</a>{{if .Description}}: {{.Description}}{{end}}</li>{{end}}
-        </ul>
-    </p>
-    {{end}}
-
-    <p>
-        Weitere Informationen zu Club-Läufen, Terminen und Treffpunkten findest du hier:
-    </p>
-    <ul>
-        {{if .Club.Instagram}}
-        <li><a href="{{.Club.Instagram}}" target="_blank">Instagram</a></li>
-        {{end}}
-        {{if .Club.StravaClub}}
-        <li><a href="{{.Club.StravaClub}}" target="_blank">Strava-Club</a></li>
-        {{end}}
-        {{if .Club.Website}}
-        <li><a href="{{.Club.Website}}" target="_blank">Website</a></li>
-        {{end}}
-    </ul>
+    <div class="grid-2-1">
+        <div>
+            <p>
+                <em>{{.Club.Name}}</em> ist ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a>
+            </p>
+            <p>
+                {{.Club.Description}}
+            </p>
+            {{if .Club.Tags}}<p>
+                Kategorien:
+                <ul>
+                    {{range .Club.Tags}}<li><a href="{{BasePath .Slug}}">{{.Name}}</a>{{if .Description}}: {{.Description}}{{end}}</li>{{end}}
+                </ul>
+            </p>{{end}}
+            <p>
+                Weitere Informationen zu Club-Läufen, Terminen und Treffpunkten findest du hier:
+            </p>
+            <ul>
+                {{if .Club.Instagram}}
+                <li><a href="{{.Club.Instagram}}" target="_blank">Instagram</a></li>
+                {{end}}
+                {{if .Club.StravaClub}}
+                <li><a href="{{.Club.StravaClub}}" target="_blank">Strava-Club</a></li>
+                {{end}}
+                {{if .Club.Website}}
+                <li><a href="{{.Club.Website}}" target="_blank">Website</a></li>
+                {{end}}
+            </ul>
+        </div>
+        {{template "affiliate.html" .}}
+    </div>
 
     {{if .Club.LatLon}}
     <div id="club-map" data-name="{{.Club.Name}}" data-lat="{{.Club.LatLon.Lat}}" data-lon="{{.Club.LatLon.Lon}}"></div>

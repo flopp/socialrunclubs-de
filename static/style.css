@@ -112,3 +112,20 @@ header, footer {
 .marker-cluster {
     color: black;
 }
+
+.grid-2-1 {
+    display: flex;
+    flex-direction: row;
+    gap: var(--pico-spacing);
+    align-items: flex-start;
+}
+.grid-2-1 > :first-child {
+    flex: 2;
+}
+.grid-2-1 > :last-child {
+    flex: 1;
+}
+
+.affiliate {
+    font-size: smaller;
+}

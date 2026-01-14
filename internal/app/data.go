@@ -89,6 +89,7 @@ type Club struct {
 	LatLon         *utils.LatLon
 	Instagram      string
 	StravaClub     string
+	Whatsapp       string
 	Website        string
 	AddedRaw       string
 	UpdatedRaw     string
@@ -172,7 +173,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		return fmt.Errorf("sheet is empty")
 	}
 
-	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WEBSITE_URL"}
+	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WHATSAPP_URL", "WEBSITE_URL"}
 	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
 	if err != nil {
 		return err
@@ -206,6 +207,12 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
 		if club.StravaClub, err = getVal("STRAVA_URL", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if club.StravaClub, err = getVal("STRAVA_URL", row, colIdx); err != nil {
+			return fmt.Errorf("row %d: %v", index+2, err)
+		}
+		if club.Whatsapp, err = getVal("WHATSAPP_URL", row, colIdx); err != nil {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
 		if club.Website, err = getVal("WEBSITE_URL", row, colIdx); err != nil {

@@ -8,7 +8,7 @@ require (
 	github.com/codingsince1985/geo-golang v1.8.5
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258
-	golang.org/x/text v0.32.0
+	golang.org/x/text v0.33.0
 	google.golang.org/api v0.260.0
 )
 

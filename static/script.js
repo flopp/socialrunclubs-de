@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // MAPS
     const germany = [
-        [50.913868, 5.603027],
-        [55.329144, 8.041992],
-        [50.999929, 15.227051],
-        [47.034162, 10.217285]
+        [50.913868, 5.8],
+        [55.1, 8.041992],
+        [50.999929, 15.0],
+        [47.3, 10.217285]
     ];
     var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,

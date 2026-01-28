@@ -129,3 +129,7 @@ header, footer {
 .affiliate {
     font-size: smaller;
 }
+
+.pl-1rem {
+    padding-left: 1rem;
+}

@@ -27,6 +27,7 @@ type TemplateData struct {
 	City           *City
 	Club           *Club
 	Tag            *Tag
+	Post           *Post
 }
 
 func (t TemplateData) IsRemoteTarget() bool {
@@ -141,6 +142,13 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			Canonical:   "/tags.html",
 			Template:    "tags.html",
 			OutFile:     "tags.html",
+		},
+		{
+			Title:       "Social Run Club Artikel",
+			Description: "Eine Übersicht über alle Social Run Club Artikel.",
+			Canonical:   "/post/",
+			Template:    "posts.html",
+			OutFile:     "post/index.html",
 		},
 	}
 	for _, page := range pages {
@@ -264,6 +272,29 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		fileName := filepath.Join(config.OutputDir, tag.Slug(), "index.html")
 		if err := utils.ExecuteTemplate("tag.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering tag template %q: %w", tag.Name, err)
+		}
+		sitemapUrls = append(sitemapUrls, tdata.Canonical)
+	}
+
+	for _, post := range data.Posts {
+		tdata := TemplateData{
+			Config:         config,
+			Data:           data,
+			Post:           post,
+			isRemoteTarget: config.IsRemoteTarget,
+			basePath:       config.OutputDir,
+			Title:          post.Title,
+			Description:    fmt.Sprintf("Artikel: %s", post.Title),
+			Canonical:      canonical(post.Slug),
+			SubmitUrl:      config.Google.SubmitUrl,
+			ReportUrl:      config.Google.ReportUrl,
+			CssFiles:       cssFiles,
+			JSFiles:        otherJS,
+			UmamiJS:        umamiJS,
+		}
+		fileName := filepath.Join(config.OutputDir, post.Slug, "index.html")
+		if err := utils.ExecuteTemplate(post.TemplateFile, fileName, tdata); err != nil {
+			return fmt.Errorf("rendering post template %q: %w", post.Title, err)
 		}
 		sitemapUrls = append(sitemapUrls, tdata.Canonical)
 	}

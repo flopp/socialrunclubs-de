@@ -1,0 +1,13 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>Artikel</h1>
+    <ul>
+        {{range .Data.Posts}}
+        <li>
+            <a href="{{BasePath .Slug}}">{{.Title}}</a>
+        </li>
+        {{end}}
+</section>
+
+{{template "footer.html" .}}

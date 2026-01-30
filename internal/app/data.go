@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"os"
 
 	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
@@ -119,6 +123,12 @@ func (c *Club) Search() string {
 	return strings.ToLower(fmt.Sprintf("%s %s", c.Name, c.City.Name))
 }
 
+type Post struct {
+	Title        string
+	Slug         string
+	TemplateFile string
+}
+
 type Data struct {
 	Now         time.Time
 	NowStr      string
@@ -130,6 +140,7 @@ type Data struct {
 	LatestClubs []*Club
 	TopCities   []*City
 	NumberClubs int
+	Posts       []*Post
 	Redirects   map[string]string
 }
 
@@ -413,6 +424,45 @@ func processTagsSheet(sheet utils.Sheet, data *Data) error {
 	return nil
 }
 
+func collectPosts(data *Data) error {
+	data.Posts = make([]*Post, 0)
+
+	files, err := filepath.Glob("templates/posts/*.html")
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		content, err := os.ReadFile(file)
+		if err != nil {
+			return fmt.Errorf("reading post file %s: %v", file, err)
+		}
+
+		title := ""
+		re := regexp.MustCompile(`<!--\s*TITLE\s+"([^"]+)"\s*-->`)
+		matches := re.FindStringSubmatch(string(content))
+		if len(matches) == 0 {
+			return fmt.Errorf("post file %s: no TITLE found", file)
+		}
+
+		if len(matches) > 1 {
+			title = matches[1]
+		}
+
+		filename := filepath.Base(file)
+		slug := "/post/" + strings.TrimSuffix(filename, filepath.Ext(filename)) + "/"
+		templateName := "posts/" + filename
+
+		data.Posts = append(data.Posts, &Post{
+			Title:        title,
+			Slug:         slug,
+			TemplateFile: templateName,
+		})
+	}
+
+	return nil
+}
+
 func GetData(config Config) (*Data, error) {
 	data := &Data{
 		Now:         time.Now(),
@@ -568,6 +618,10 @@ func GetData(config Config) (*Data, error) {
 		data.TopCities = topCities[:5]
 	} else {
 		data.TopCities = topCities
+	}
+
+	if err := collectPosts(data); err != nil {
+		return nil, fmt.Errorf("collecting posts: %v", err)
 	}
 
 	return data, nil

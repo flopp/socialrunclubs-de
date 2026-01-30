@@ -17,7 +17,9 @@ type TemplateData interface {
 var templates = make(map[string]*template.Template)
 
 func loadTemplate(name string, data TemplateData) (*template.Template, error) {
-	if t, ok := templates[name]; ok {
+	name2 := filepath.Base(name)
+
+	if t, ok := templates[name2]; ok {
 		return t, nil
 	}
 
@@ -30,7 +32,7 @@ func loadTemplate(name string, data TemplateData) (*template.Template, error) {
 	files := make([]string, 0, 1+len(parts))
 	files = append(files, fmt.Sprintf("templates/%s", name))
 	files = append(files, parts...)
-	t, err := template.New(name).Funcs(template.FuncMap{
+	t, err := template.New(name2).Funcs(template.FuncMap{
 		"BasePath": func(p string) string {
 			ifFile := strings.Contains(filepath.Base(p), ".")
 			if data.IsRemoteTarget() {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand/v2"
 	"sort"
 	"strings"
 	"time"
@@ -534,7 +533,7 @@ func GetData(config Config) (*Data, error) {
 			return addedClubs[i].AddedRaw > addedClubs[j].AddedRaw
 		})
 
-		// get áll clubs with latest date
+		// get all clubs with latest date
 		latestDate := addedClubs[0].AddedRaw
 		candidates := make([]*Club, 0)
 		for i := 0; i < len(addedClubs); i++ {
@@ -542,16 +541,12 @@ func GetData(config Config) (*Data, error) {
 				candidates = append(candidates, addedClubs[i])
 			}
 		}
-		// not enough -> just take latest 5
-		if len(candidates) < 5 {
-			candidates = addedClubs[:5]
+		if len(candidates) >= 5 {
+			data.LatestClubs = candidates[:5]
+		} else {
+			// not enough -> just take latest 5
+			data.LatestClubs = addedClubs[:5]
 		}
-
-		// get random selection of 5 clubs from candidates
-		rand.Shuffle(len(candidates), func(i, j int) {
-			candidates[i], candidates[j] = candidates[j], candidates[i]
-		})
-		data.LatestClubs = candidates[:5]
 	}
 
 	// get the 5 cities with the most clubs:

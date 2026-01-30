@@ -31,7 +31,7 @@
                 </p>
                 <ul>
                     {{range .Data.LatestClubs}}
-                    <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{.City.Name}})</li>
+                    <li>{{.AddedRaw}} - <a href="{{BasePath .Slug}}">{{.Name}}</a> ({{.City.Name}})</li>
                     {{end}}
                 </ul>
             </div>

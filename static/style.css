@@ -26,7 +26,14 @@ header, footer {
     display: flex;
     flex-direction: row;
 }
-@media (max-width: 768px) {
+
+.twoline-nav > ul:first-child {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+@media (max-width: 1024px) {
     .twoline-nav {
         flex-direction: column;
     }
@@ -34,6 +41,7 @@ header, footer {
         padding-bottom: 0;
     }
 }
+
 
 .icon-primary {
     background: var(--pico-primary-background);
@@ -128,8 +136,4 @@ header, footer {
 
 .affiliate {
     font-size: smaller;
-}
-
-.pl-1rem {
-    padding-left: 1rem;
 }

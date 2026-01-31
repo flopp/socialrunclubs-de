@@ -36,13 +36,14 @@
     <header>
         <div class="container" style="display: block">
             <nav class="twoline-nav">
-                <ul>
+                <ul class="space-between">
                     <li>
                         <a href="{{BasePath "/"}}" style="text-decoration: none;">
                             <img src="{{BasePath "/favicon.svg"}}" alt="socialrunclubs.de Logo" style="width: 1.5em; height: 1.5em;">
                             <b style="font-size: 1.5em; vertical-align: middle;">Social Run Clubs</b>
                         </a>
                     </li>
+                    <li><a href="{{.SubmitUrl}}" target="_blank"><button><span class="plus-icon icon-white"> </span> Eintragen</button></a></li>
                 </ul>
                 <ul>
                     <li><a href="{{BasePath "/clubs.html"}}">Clubs</a></li>
@@ -50,7 +51,6 @@
                     <li><a href="{{BasePath "/tags.html"}}">Kategorien</a></li>
                     <li><a href="{{BasePath "/post/"}}">Artikel</a></li>
                     <li><a href="https://www.instagram.com/socialrunclubs/" target="_blank"><span class="insta-icon icon-primary"> </span></a></li>
-                    <li class="pl-1rem"><a href="{{.SubmitUrl}}" target="_blank"><button><span class="plus-icon icon-white"> </span> Eintragen</button></a></li>
                 </ul>
             </nav>
         </div>

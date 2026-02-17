@@ -26,9 +26,18 @@
             Hilf uns und füge einen bestehenden Club hinzu:
         </p>
         {{end}}
+        {{if .City.Clubs}}
         <p> 
             <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
         </p>
+        {{else}}
+        <p> 
+            <div role="group">
+                <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
+                <a role="button" class="secondary" href="https://www.google.com/search?q=run+clubs+{{.City.Name}}+site:instagram.com" target="_blank">Suche bei Google</a>
+            </div>
+        </p>
+        {{end}}
     </div>
 
     {{if .City.LatLon}}

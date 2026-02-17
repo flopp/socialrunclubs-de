@@ -7,32 +7,33 @@
         <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}"><span class="share-icon icon-white"> </span> Seite Teilen</a>
     </p>
 
-    <div class="grid-2-1">
-        <div>
-            {{if .City.Clubs}}
-            <p>
-                Im {{.City.Name}} gibt es folgende Social Run Clubs, offene Lauftreffs und Laufgruppen:
-            </p>
-            <ul>
-                {{range .City.Clubs}}
-                <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
-                {{end}}
-            </ul>
-            <p>
-                Dein Club ist nicht mit dabei? Kein Problem, du kannst ihn hier hinzufügen:
-            </p>
-            {{else}}
-            <p>
-                Wir haben noch keine Social Run Clubs für {{.City.Name}} in unserem Verzeichnis.
-                Hilf uns und füge einen bestehenden Club hinzu:
-            </p>
+    <div>
+        {{if .City.Clubs}}
+        <p>
+            Im {{.City.Name}} gibt es folgende Social Run Clubs, offene Lauftreffs und Laufgruppen:
+        </p>
+        <ul>
+            {{range .City.Clubs}}
+            <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
             {{end}}
-            <p>
-                <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
-            </p>
-        </div>
-        {{template "affiliate.html" .}}
+        </ul>
+        <p>
+            Dein Club ist nicht mit dabei? Kein Problem, du kannst ihn hier hinzufügen:
+        </p>
+        {{else}}
+        <p>
+            Wir haben noch keine Social Run Clubs für {{.City.Name}} in unserem Verzeichnis.
+            Hilf uns und füge einen bestehenden Club hinzu:
+        </p>
+        {{end}}
+        <p> 
+            <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
+        </p>
     </div>
+
+    {{if .City.LatLon}}
+    <div id="city-map" class="small-map" data-name="{{.City.Name}}" data-lat="{{.City.LatLon.Lat}}" data-lon="{{.City.LatLon.Lon}}"></div>
+    {{end}}
 
     <h2>Nächste Städte mit Social Run Clubs:</h2>
     <ul>

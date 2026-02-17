@@ -25,19 +25,45 @@ document.addEventListener('DOMContentLoaded', function() {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
-    
+
+    const fixLeafletButtons = (div) => {
+        div.querySelectorAll('[role="button"]').forEach((btn) => {
+            btn.removeAttribute('role');
+        });
+    };
+
     var mapDiv = document.getElementById('club-map');
     if (mapDiv) {
         var lat = parseFloat(mapDiv.dataset.lat);
         var lon = parseFloat(mapDiv.dataset.lon);
+        var popup = `<b>${mapDiv.dataset.name}</b>`;
+        if (mapDiv.dataset.nolocation !== undefined) {
+            popup += `<br><i>irgendwo in ${mapDiv.dataset.cityname}</i><br>(Wir kennen den genauen Ort leider nicht 😞)`;
+        } else {
+            popup += `<br><i>${mapDiv.dataset.cityname}</i>`;
+        }
+        var map = L.map('club-map', {gestureHandling: true}).setView([lat, lon], 13);
+        baseLayer.addTo(map);
+        L.marker([lat, lon]).addTo(map)
+            .bindPopup(popup).openPopup();
+        fixLeafletButtons(mapDiv);
+    }
+    
+    mapDiv = document.getElementById('city-map');
+    if (mapDiv) {
+        var lat = parseFloat(mapDiv.dataset.lat);
+        var lon = parseFloat(mapDiv.dataset.lon);
         var name = mapDiv.dataset.name;
-        var map = L.map('club-map').setView([lat, lon], 13);
+        var map = L.map('city-map', {gestureHandling: true});
         baseLayer.addTo(map);
         L.marker([lat, lon]).addTo(map)
             .bindPopup(name).openPopup();
+        map.fitBounds(germany);
+        fixLeafletButtons(mapDiv);
     }
 
-    if (document.getElementById('city-map')) {
+    mapDiv = document.getElementById('cities-map');
+    if (mapDiv) {
         var markers = L.layerGroup();
         document.querySelectorAll('[data-search]').forEach(function(cityEl) {
             var city = {
@@ -53,9 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
             markers.addLayer(marker);
         });
         var map = L.map('city-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+        fixLeafletButtons(mapDiv);
     }
 
-    if (document.getElementById('clubs-map')) {
+    mapDiv = document.getElementById('clubs-map');
+    if (mapDiv) {
         //var markers = L.markerClusterGroup();
         var markers = L.layerGroup();
         document.querySelectorAll('[data-search]').forEach(function(clubEl) {
@@ -70,9 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
             markers.addLayer(marker);
         });
         var map = L.map('clubs-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+        fixLeafletButtons(mapDiv);
     }
 
-    if (document.getElementById('cluster-map')) {
+    mapDiv = document.getElementById('cluster-map');
+    if (mapDiv) {
         var markers = L.markerClusterGroup();
 
         clusterData.forEach(function(club) {
@@ -81,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             markers.addLayer(marker);
         });
         var map = L.map('cluster-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+        fixLeafletButtons(mapDiv);
     }
 
     // SHARE

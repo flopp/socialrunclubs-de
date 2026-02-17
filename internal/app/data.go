@@ -18,7 +18,7 @@ import (
 type City struct {
 	Name                 string
 	Clubs                []*Club
-	Coords               *utils.LatLon
+	LatLon               *utils.LatLon
 	NearestCities        []*City
 	NearestCitiesNoClub  []*City
 	SizeIndexWithoutClub int
@@ -629,7 +629,7 @@ func GetData(config Config) (*Data, error) {
 
 func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error {
 	for _, city := range data.Cities {
-		if city.Coords != nil {
+		if city.LatLon != nil {
 			continue
 		}
 		/*
@@ -641,7 +641,7 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 		if err != nil {
 			log.Panicf("getting coordinates for city %q: %v", city.Name, err)
 		} else {
-			city.Coords = &coords
+			city.LatLon = &coords
 		}
 	}
 
@@ -649,7 +649,7 @@ func AnnotateCityCoordinates(data *Data, geocoder *utils.CachingGeocoder) error 
 }
 
 func findNearestCities(city *City, cities []*City, maxResults int, withClubs bool) []*City {
-	if city.Coords == nil {
+	if city.LatLon == nil {
 		return nil
 	}
 
@@ -662,7 +662,7 @@ func findNearestCities(city *City, cities []*City, maxResults int, withClubs boo
 		if other == city {
 			continue
 		}
-		if other.Coords == nil {
+		if other.LatLon == nil {
 			continue
 		}
 		if withClubs && len(other.Clubs) == 0 {
@@ -672,7 +672,7 @@ func findNearestCities(city *City, cities []*City, maxResults int, withClubs boo
 			continue
 		}
 
-		distance := utils.Distance(*city.Coords, *other.Coords)
+		distance := utils.Distance(*city.LatLon, *other.LatLon)
 		distances = append(distances, cityDistance{city: other, distance: distance})
 	}
 	sort.Slice(distances, func(i, j int) bool {

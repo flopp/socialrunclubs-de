@@ -14,7 +14,7 @@
 
     <ul>
         {{range .Data.Cities}} {{if .Clubs}}
-        <li data-city data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .Coords}}data-lat="{{.Coords.Lat}}" data-lon="{{.Coords.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        <li data-city data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-clubs="{{len .Clubs}}" {{if .LatLon}}data-lat="{{.LatLon.Lat}}" data-lon="{{.LatLon.Lon}}"{{end}}><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
         {{end}}{{end}}
     </ul>
 
@@ -24,7 +24,7 @@
 </section>
 
 </section>
-    <div id="city-map" class="big-map"></div>
+    <div id="cities-map" class="big-map"></div>
 </section>
 
 {{template "footer.html" .}}

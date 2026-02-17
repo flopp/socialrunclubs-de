@@ -14,6 +14,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // CITY SEARCH
+    var citySearchInput = document.getElementById('city-search-input');
+    if (citySearchInput) {
+        var citySearchResults = document.getElementById('city-search-results');
+        const addNotFouundResult = () => {
+            const liEl = document.createElement('li');
+            liEl.textContent = 'Keine passende Stadt gefunden';
+            citySearchResults.appendChild(liEl);
+        };
+        const addMoreResultsHint = (count) => {
+            const liEl = document.createElement('li');
+            liEl.textContent = `... und ${count} weitere Städte`;
+            citySearchResults.appendChild(liEl);
+        };
+        const addResult = (city) => {
+            const cityName = city[0];
+            const cityUrl = city[1];
+            const cityClubs = city[2];
+            const clubText = cityClubs == 1 ? 'Social Run Club' : 'Social Run Clubs';
+            const liEl = document.createElement('li');
+            const aEl = document.createElement('a');
+            aEl.href = cityUrl;
+            aEl.textContent = `${cityName} (${cityClubs} ${clubText})`;
+            aEl.classList.add('city-search-result');
+            liEl.appendChild(aEl);
+            citySearchResults.appendChild(liEl);
+        };
+        citySearchInput.addEventListener('input', function() {
+            var filter = citySearchInput.value.toLowerCase().trim();
+            if (filter === '') {
+                citySearchResults.style.display = 'none';
+                citySearchResults.innerHTML = '';
+                return;
+            }
+            var results = [];
+            cityData.forEach(function(city) {
+                if (city[0].toLowerCase().includes(filter)) {
+                    results.push(city);
+                }
+            });
+            citySearchResults.innerHTML = '';
+            if (results.length === 0) {
+                addNotFouundResult();
+            } else {
+                if (results.length > 5) {
+                    var top5 = results.slice(0, 5);
+                    top5.forEach(addResult);
+                    addMoreResultsHint(results.length - 5);
+                } else {
+                    results.forEach(addResult);
+                }
+            }
+            citySearchResults.style.display = 'block';    
+        });
+    }
+
     // MAPS
     const germany = [
         [50.913868, 5.8],

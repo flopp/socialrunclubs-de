@@ -2,21 +2,29 @@
 
 <section>
     <article>
-    <h1>Nie wieder alleine laufen: Finde deinen Social Run Club!</h1>
-    <p>
-        Wir zeigen dir {{.Data.NumberClubs}} Social Run Clubs von <a href="{{BasePath "/flensburg/"}}">Flensburg</a> bis <a href="{{BasePath "/muenchen/"}}">München</a>,
-        von <a href="{{BasePath "/aachen/"}}">Aachen</a> bis <a href="{{BasePath "/goerlitz/"}}">Görlitz</a>.
-        Egal ob Coffee-Run oder After-Work-Sprint - die passende Lauf-Community wartet schon auf dich.
-        <br /><br />
-        <a role="button" href="{{BasePath "/cities.html"}}">Zur Städte-Suche</a>
-        <a role="button" href="{{BasePath "/clubs.html"}}">Zur Club-Suche</a>
-    </p>
+        <h1>Nie wieder alleine laufen: Finde deinen Social Run Club!</h1>
+        <p>
+            Wir zeigen dir {{.Data.NumberClubs}} Social Run Clubs von <a href="{{BasePath "/flensburg/"}}">Flensburg</a> bis <a href="{{BasePath "/muenchen/"}}">München</a>,
+            von <a href="{{BasePath "/aachen/"}}">Aachen</a> bis <a href="{{BasePath "/goerlitz/"}}">Görlitz</a>.
+            Egal ob Coffee-Run oder After-Work-Sprint - die passende Lauf-Community wartet schon auf dich.
+        </p>
+        <p>
+            <input type="search" id="city-search-input" name="search" placeholder="Suche deine Stadt..." />
+            <ul id="city-search-results"></ul>
+        </p>
+        <p>
+            <div class="grid">
+                <a role="button" href="{{BasePath "/cities.html"}}">Alle Städte</a>
+                <a role="button" href="{{BasePath "/clubs.html"}}">Alle Clubs</a>
+            </div>
+        </p>
     </article>
 </section>
 
 <section>
     <div id="cluster-map" class="big-map"></div>
     <script>
+        var cityData = [{{range .Data.Cities}}{{if .Clubs}}["{{.Name}}","{{BasePath .Slug}}",{{.NumberOfClubs}}],{{end}}{{end}}];
         var clusterData = [{{range .Data.Clubs}}[{{if .LatLon}}{{.LatLon.Lat}},{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lat}}, {{.City.LatLon.Lon}}{{end}},"{{.Name}}","{{.City.Name}}","{{BasePath .Slug}}"],{{end}}];
     </script>
 </section>

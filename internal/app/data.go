@@ -57,6 +57,10 @@ func (c *City) Show() bool {
 	return c.SizeIndexWithoutClub <= 10 || len(c.Clubs) > 0
 }
 
+func (c *City) NumberOfClubs() int {
+	return len(c.Clubs)
+}
+
 func (c *City) SanitizeName() string {
 	return utils.SanitizeName(c.Name)
 }

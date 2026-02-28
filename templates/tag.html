@@ -12,17 +12,22 @@
 
     {{template "filter.html" .}}
 
-    <ul>
+    <div class="two-columns">
         {{range .Tag.Clubs}}
-        <li data-search="{{.Search}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        <a class="card-link" href="{{BasePath .Slug}}" data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.LatLon.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lon}}{{end}}">
+            <article>
+                <img src="{{BasePath .Image}}" width=50 height="50">
+                <span>{{.Name}} (in {{.City.Name}})</span>
+            </article>
+        </a>
         {{end}}
-    </ul>
-    <p>
-        Dein Club ist nicht mit dabei? Kein Problem, du kannst ihn hier hinzufügen:
-    </p>
-    <p>
-        <a role="button" href="{{.SubmitUrl}}" target="_blank">Social Run Club hinzufügen</a>
-    </p>
+        <a class="card-link" href="{{.SubmitUrl}}" target="_blank">
+            <article class="add-club" role="button">
+                <span class="plus-icon icon-white"> </span>
+                <span>Social Run Club hinzufügen</span>
+            </article>
+        </a>
+    </div>
 </section>
 
 {{template "footer.html" .}}

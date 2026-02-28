@@ -32,27 +32,18 @@
 <section>
     <article>
         <h2>Letzte Änderungen</h2>
-        <div class="grid">
-            <div>
-                <p>
-                    Hier sind die Clubs, die zuletzt hinzugefügt wurden:
-                </p>
-                <ul>
-                    {{range .Data.LatestClubs}}
-                    <li>{{.AddedRaw}} - <a href="{{BasePath .Slug}}">{{.Name}}</a> ({{.City.Name}})</li>
-                    {{end}}
-                </ul>
-            </div>
-            <div>
-                <p>
-                    Hier sind die 5 <a href="{{BasePath "/cities.html"}}">Städte</a> mit den meisten Social Run Clubs:
-                </p>
-                <ul>
-                    {{range .Data.TopCities}}
-                    <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
-                    {{end}}
-                </ul>
-            </div>
+        <p>
+            Hier sind die Clubs, die zuletzt hinzugefügt wurden:
+        </p>
+        <div class="two-columns">
+            {{range .Data.LatestClubs}}
+            <a class="card-link" href="{{BasePath .Slug}}">
+                <article>
+                    <img src="{{BasePath .Image}}" width=50 height="50">
+                    <span>{{.AddedRaw}}<br>{{.Name}} (in {{.City.Name}})</span>
+                </article>
+            </a>
+            {{end}}
         </div>
     </article>
 </section>

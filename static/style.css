@@ -167,3 +167,12 @@ header, footer {
 .add-club {
     justify-content: center;
 }
+
+.club-header {
+    display: flex;
+    flex-direction: row;
+    gap: var(--pico-spacing);
+}
+.club-header img {
+    border-radius: var(--pico-border-radius);
+}

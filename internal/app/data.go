@@ -598,8 +598,9 @@ func GetData(config Config) (*Data, error) {
 		}
 	}
 
-	// get selection of 5 latest clubs
+	// get selection of 6 latest clubs
 	if len(addedClubs) > 0 {
+		numberOfLatest := 6
 		// sort by date, latest first
 		sort.Slice(addedClubs, func(i, j int) bool {
 			return addedClubs[i].AddedRaw > addedClubs[j].AddedRaw
@@ -613,11 +614,11 @@ func GetData(config Config) (*Data, error) {
 				candidates = append(candidates, addedClubs[i])
 			}
 		}
-		if len(candidates) >= 5 {
-			data.LatestClubs = candidates[:5]
+		if len(candidates) >= numberOfLatest {
+			data.LatestClubs = candidates[:numberOfLatest]
 		} else {
-			// not enough -> just take latest 5
-			data.LatestClubs = addedClubs[:5]
+			// not enough -> just take latest numberOfLatest
+			data.LatestClubs = addedClubs[:numberOfLatest]
 		}
 	}
 

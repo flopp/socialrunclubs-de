@@ -8,11 +8,16 @@
 
     {{template "filter.html" .}}
 
-    <ul>
+    <div class="two-columns">
         {{range .Data.Clubs}}
-        <li data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.LatLon.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lon}}{{end}}"><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{if .City}}in <a href="{{BasePath .City.Slug}}">{{.City.Name}}</a>{{end}})</li>
+        <a class="card-link" href="{{BasePath .Slug}}" data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.LatLon.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lon}}{{end}}">
+            <article>
+                <img src="{{BasePath .Image}}" width=50 height="50">
+                <span>{{.Name}} (in {{.City.Name}})</span>
+            </article>
+        </a>
         {{end}}
-    </ul>
+    </div>
 
     <div id="clubs-map" class="big-map"></div>
 </section>

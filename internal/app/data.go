@@ -119,8 +119,26 @@ func (c *Club) SanitizeName() string {
 	return utils.SanitizeName(c.Name)
 }
 
+var reInstagramProfile = regexp.MustCompile(`https?://(www\.)?instagram\.com/([^/?]+)/*`)
+
+func (c *Club) InstagramProfile() string {
+	if c.Instagram == "" {
+		return ""
+	}
+	// Extract Instagram profile name from URL
+	matches := reInstagramProfile.FindStringSubmatch(c.Instagram)
+	if len(matches) > 1 {
+		return matches[2]
+	}
+	return ""
+}
+
 func (c *Club) Slug() string {
 	return fmt.Sprintf("/%s/%s", c.City.SanitizeName(), c.SanitizeName())
+}
+
+func (c *Club) Image() string {
+	return fmt.Sprintf("/%s/%s/img.jpg", c.City.SanitizeName(), c.SanitizeName())
 }
 
 func (c *Club) Search() string {
@@ -580,8 +598,9 @@ func GetData(config Config) (*Data, error) {
 		}
 	}
 
-	// get selection of 5 latest clubs
+	// get selection of 6 latest clubs
 	if len(addedClubs) > 0 {
+		numberOfLatest := 6
 		// sort by date, latest first
 		sort.Slice(addedClubs, func(i, j int) bool {
 			return addedClubs[i].AddedRaw > addedClubs[j].AddedRaw
@@ -595,11 +614,11 @@ func GetData(config Config) (*Data, error) {
 				candidates = append(candidates, addedClubs[i])
 			}
 		}
-		if len(candidates) >= 5 {
-			data.LatestClubs = candidates[:5]
+		if len(candidates) >= numberOfLatest {
+			data.LatestClubs = candidates[:numberOfLatest]
 		} else {
-			// not enough -> just take latest 5
-			data.LatestClubs = addedClubs[:5]
+			// not enough -> just take latest numberOfLatest
+			data.LatestClubs = addedClubs[:numberOfLatest]
 		}
 	}
 

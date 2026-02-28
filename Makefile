@@ -7,9 +7,13 @@ all:
 	@echo "make sync       -> build and upload to socialrunclubs.de"
 	@echo "make run-remote -> sync & run remote script"
 
- .bin/generate-linux: cmd/generate/main.go go.mod internal/utils/*.go internal/app/*.go templates/*.html templates/parts/*.html
+.bin/generate-linux: cmd/generate/main.go go.mod internal/utils/*.go internal/app/*.go templates/*.html templates/parts/*.html
 	mkdir -p .bin
 	GOOS=linux GOARCH=amd64 go build -o .bin/generate-linux cmd/generate/main.go
+
+.phony: get-images
+get-images:
+	go run cmd/get_images/main.go -config local.json
 
 .phony: run-local
 run-local:
@@ -28,6 +32,7 @@ backup:
 sync: .repo/.git/config .bin/generate-linux
 	(cd .repo && git pull --quiet)
 	rsync -a production.json scripts/cronjob.sh .bin/generate-linux $(SERVER):$(TARGET_DIR)/
+	rsync -a .images/ $(SERVER):$(TARGET_DIR)/images	
 	rsync -a .repo/ $(SERVER):$(TARGET_DIR)/repo
 	ssh $(SERVER) chmod +x $(TARGET_DIR)/cronjob.sh $(TARGET_DIR)/generate-linux
 

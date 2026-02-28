@@ -49,6 +49,31 @@ func FillDDescription(description string) string {
 	return description
 }
 
+func copyPlaceholderImage(config Config, targetPath string) error {
+	placeholderImage := "static/placeholder.jpg"
+	if err := utils.CopyFile(placeholderImage, targetPath); err != nil {
+		return fmt.Errorf("copying placeholder image: %w", err)
+	}
+	return nil
+}
+
+func copyClubImage(config Config, club *Club, targetPath string) error {
+	instagramProfile := club.InstagramProfile()
+	if instagramProfile != "" {
+		cachedImagName := filepath.Join(config.CacheDir, "instagram", instagramProfile, "image.jpg")
+		if utils.FileExists(cachedImagName) {
+			if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
+				return fmt.Errorf("copying Instagram image for club %q: %w", club.Name, err)
+			}
+		} else {
+			return copyPlaceholderImage(config, targetPath)
+		}
+	} else {
+		return copyPlaceholderImage(config, targetPath)
+	}
+	return nil
+}
+
 func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 	umamiJS := ""
 	otherJS := make([]string, 0)
@@ -223,6 +248,12 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 			if err := utils.ExecuteTemplate("club.html", fileName, tdata); err != nil {
 				return fmt.Errorf("rendering club template %q: %w", club.Name, err)
 			}
+
+			imgName := filepath.Join(config.OutputDir, club.Slug(), "img.jpg")
+			if err := copyClubImage(config, club, imgName); err != nil {
+				return fmt.Errorf("copying club image for club %q: %w", club.Name, err)
+			}
+
 			sitemapUrls = append(sitemapUrls, tdata.Canonical)
 		}
 	}

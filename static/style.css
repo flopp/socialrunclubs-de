@@ -137,3 +137,33 @@ header, footer {
 .affiliate {
     font-size: smaller;
 }
+
+/* responsive two column layout for articles */
+.two-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pico-spacing);
+    margin-bottom: var(--pico-spacing);
+}
+.two-columns > .card-link > article{
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: row;
+    gap: var(--pico-spacing);
+    align-items: center;
+}
+.two-columns > .card-link > article > img {
+    border-radius: var(--pico-border-radius);
+}
+.two-columns > .card-link {
+    flex: 1 1 100%;
+    text-decoration: none;
+}
+@media (min-width: 1024px) {
+    .two-columns > .card-link {
+        flex: 1 1 calc(50% - var(--pico-spacing) / 2);
+    }
+}
+.add-club {
+    justify-content: center;
+}

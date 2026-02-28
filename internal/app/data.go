@@ -119,8 +119,26 @@ func (c *Club) SanitizeName() string {
 	return utils.SanitizeName(c.Name)
 }
 
+var reInstagramProfile = regexp.MustCompile(`https?://(www\.)?instagram\.com/([^/?]+)/*`)
+
+func (c *Club) InstagramProfile() string {
+	if c.Instagram == "" {
+		return ""
+	}
+	// Extract Instagram profile name from URL
+	matches := reInstagramProfile.FindStringSubmatch(c.Instagram)
+	if len(matches) > 1 {
+		return matches[2]
+	}
+	return ""
+}
+
 func (c *Club) Slug() string {
 	return fmt.Sprintf("/%s/%s", c.City.SanitizeName(), c.SanitizeName())
+}
+
+func (c *Club) Image() string {
+	return fmt.Sprintf("/%s/%s/img.jpg", c.City.SanitizeName(), c.SanitizeName())
 }
 
 func (c *Club) Search() string {

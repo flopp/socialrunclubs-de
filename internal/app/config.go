@@ -10,6 +10,7 @@ type Config struct {
 	IsRemoteTarget bool
 	OutputDir      string
 	CacheDir       string
+	ImageDir       string
 	Google         struct {
 		APIKey    string
 		SheetId   string

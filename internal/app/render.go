@@ -60,7 +60,7 @@ func copyPlaceholderImage(config Config, targetPath string) error {
 func copyClubImage(config Config, club *Club, targetPath string) error {
 	instagramProfile := club.InstagramProfile()
 	if instagramProfile != "" {
-		cachedImagName := filepath.Join(config.CacheDir, "instagram", instagramProfile, "image.jpg")
+		cachedImagName := filepath.Join(config.ImageDir, instagramProfile+".jpg")
 		if utils.FileExists(cachedImagName) {
 			if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
 				return fmt.Errorf("copying Instagram image for club %q: %w", club.Name, err)
@@ -249,7 +249,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 				return fmt.Errorf("rendering club template %q: %w", club.Name, err)
 			}
 
-			imgName := filepath.Join(config.OutputDir, club.Slug(), "img.jpg")
+			imgName := filepath.Join(config.OutputDir, club.Image())
 			if err := copyClubImage(config, club, imgName); err != nil {
 				return fmt.Errorf("copying club image for club %q: %w", club.Name, err)
 			}

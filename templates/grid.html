@@ -1,0 +1,13 @@
+{{template "header.html" .}}
+
+<section>
+    <div class="dense-grid">
+        {{range .Data.RandomizedClubs}}
+        {{if .InstagramProfile}}
+            <img src="{{BasePath .Image}}" width=40 height="40">
+        {{end}}
+        {{end}}
+    </div>
+</section>
+
+{{template "footer.html" .}}

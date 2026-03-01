@@ -1,7 +1,9 @@
 {{template "header.html" .}}
 
 <section>
-    <div class="club-header">
+    <article>
+    <header>
+        <div class="club-header">
         <div>
             <img src="{{BasePath .Club.Image}}" width=100 height=100>
         </div>
@@ -11,7 +13,8 @@
                 <em>{{.Club.Name}}</em> ist ein Social Run Club in <a href="{{BasePath .Club.City.Slug}}">{{.Club.City.Name}}</a>
             </p>
         </div>
-    </div>     
+    </div>
+    </header>     
     <p>
         {{.Club.Description}}
     </p>
@@ -41,6 +44,7 @@
         <li><a href="https://maps.google.com/?q={{.Club.LatLon.Lat}},{{.Club.LatLon.Lon}}" target="_blank">Treffpunkt (Google Maps)</a></li>
         {{end}}
     </ul>
+    </article>
     <p class="btn-group">
         <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}"><span class="share-icon icon-white"> </span> Teilen</a>
         <a role="button" class="secondary" href="{{.ReportLink}}" target="_blank"><span class="issue-icon icon-white"> </span> Fehler melden</a>

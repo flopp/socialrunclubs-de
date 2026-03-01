@@ -351,6 +351,27 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 		return fmt.Errorf("rendering 404 template: %w", err)
 	}
 
+	// image grid
+	tdata = TemplateData{
+		Config:         config,
+		Data:           data,
+		City:           nil,
+		Club:           nil,
+		isRemoteTarget: config.IsRemoteTarget,
+		basePath:       config.OutputDir,
+		Title:          "Club Image Grid",
+		Description:    "Club Image Grid",
+		Canonical:      canonical("/grid.html"),
+		SubmitUrl:      config.Google.SubmitUrl,
+		ReportUrl:      config.Google.ReportUrl,
+		CssFiles:       cssFiles,
+		JSFiles:        otherJS,
+		UmamiJS:        umamiJS,
+	}
+	if err := utils.ExecuteTemplate("grid.html", filepath.Join(config.OutputDir, "grid.html"), tdata); err != nil {
+		return fmt.Errorf("rendering template %s: %w", "grid.html", err)
+	}
+
 	// create htaccess with error page & redirects
 	htaccessFile := filepath.Join(config.OutputDir, ".htaccess")
 	htaccessData := make([]byte, 0)

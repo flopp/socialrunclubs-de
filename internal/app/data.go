@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand/v2"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -164,6 +165,19 @@ type Data struct {
 	NumberClubs int
 	Posts       []*Post
 	Redirects   map[string]string
+}
+
+func (d *Data) RandomizedClubs() []*Club {
+	// Create a copy of the clubs slice
+	clubs := make([]*Club, len(d.Clubs))
+	copy(clubs, d.Clubs)
+
+	// Shuffle the clubs slice
+	rand.Shuffle(len(clubs), func(i, j int) {
+		clubs[i], clubs[j] = clubs[j], clubs[i]
+	})
+
+	return clubs
 }
 
 func (d *Data) getOrAddTag(name string) *Tag {

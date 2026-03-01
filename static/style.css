@@ -176,3 +176,14 @@ header, footer {
 .club-header img {
     border-radius: var(--pico-border-radius);
 }
+
+.dense-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+h1 {
+    background: linear-gradient(to right, rgb(132, 38, 108.5), rgb(111.2, 57.1, 132.9), rgb(93.45, 63.5, 153.8), rgb(67.2, 71.6, 157.4));
+    color: transparent;
+    background-clip: text;
+}

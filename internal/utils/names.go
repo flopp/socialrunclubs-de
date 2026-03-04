@@ -21,6 +21,8 @@ var specialCharReplacer = strings.NewReplacer(
 	"\"", "-",
 	"(", "-",
 	")", "-",
+	"ø", "o",
+	"Ø", "O",
 )
 
 func SanitizeName(s string) string {

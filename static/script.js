@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .bindPopup('<a href="' + city.url + '">' + city.name + '</a> (' + city.clubs + ' ' + clubText + ')');
             markers.addLayer(marker);
         });
-        var map = L.map('city-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
+        var map = L.map('cities-map', {gestureHandling: true, layers: [baseLayer, markers]}).fitBounds(germany);
         fixLeafletButtons(mapDiv);
     }
 

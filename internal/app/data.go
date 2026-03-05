@@ -98,6 +98,7 @@ type Club struct {
 	Instagram      string
 	StravaClub     string
 	Whatsapp       string
+	Signal         string
 	Website        string
 	AddedRaw       string
 	UpdatedRaw     string
@@ -324,6 +325,11 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 				continue
 			}
 			club.LatLon = &latlon
+		}
+
+		if strings.Contains(club.Whatsapp, "signal") {
+			club.Signal = club.Whatsapp
+			club.Whatsapp = ""
 		}
 
 		if club.UpdatedRaw == club.AddedRaw {

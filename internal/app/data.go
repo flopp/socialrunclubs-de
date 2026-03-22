@@ -607,6 +607,17 @@ func GetData(config Config) (*Data, error) {
 		return data.Clubs[i].City.SanitizeName() < data.Clubs[j].City.SanitizeName()
 	})
 
+	// check for duplicates (via slugs)
+	seen := make(map[string]*Club)
+	for _, club := range data.Clubs {
+		key := club.Slug()
+		if _, exists := seen[key]; exists {
+			log.Printf("duplicate club found with slug: %s", key)
+		} else {
+			seen[key] = club
+		}
+	}
+
 	// collect clubs by added date
 	var addedClubs []*Club
 	for _, city := range data.Cities {

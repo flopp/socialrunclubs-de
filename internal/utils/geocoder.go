@@ -39,18 +39,40 @@ func (g *CachingGeocoder) LookupOSM(address string) (LatLon, error) {
 	return LatLon{location.Lat, location.Lng}, nil
 }
 
-func (g *CachingGeocoder) Lookup(city string) (LatLon, error) {
+func loadCache(filePath string) (geocoderCacheData, error) {
 	data := make(geocoderCacheData)
-	filePath := g.cacheFile
 	if FileExists(filePath) {
 		if buf, err := os.ReadFile(filePath); err != nil {
-			return LatLon{}, err
+			return data, err
 		} else {
 			if err := json.Unmarshal(buf, &data); err != nil {
-				return LatLon{}, err
+				return data, err
 			}
 		}
 	}
+	return data, nil
+}
+
+func saveCache(filePath string, data geocoderCacheData) error {
+	if buf, err := json.Marshal(data); err != nil {
+		return err
+	} else {
+		if err := MakeDir(filepath.Dir(filePath)); err != nil {
+			return err
+		}
+		if err := os.WriteFile(filePath, buf, 0644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *CachingGeocoder) Lookup(city string) (LatLon, error) {
+	data, err := loadCache(g.cacheFile)
+	if err != nil {
+		return LatLon{}, err
+	}
+
 	if coords, found := data[city]; found {
 		return coords, nil
 	}
@@ -63,15 +85,8 @@ func (g *CachingGeocoder) Lookup(city string) (LatLon, error) {
 
 	data[city] = coords
 
-	if buf, err := json.Marshal(data); err != nil {
+	if err := saveCache(g.cacheFile, data); err != nil {
 		return coords, err
-	} else {
-		if err := MakeDir(filepath.Dir(filePath)); err != nil {
-			return coords, err
-		}
-		if err := os.WriteFile(filePath, buf, 0644); err != nil {
-			return coords, err
-		}
 	}
 
 	return coords, nil

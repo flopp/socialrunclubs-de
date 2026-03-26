@@ -4,12 +4,18 @@ SERVER = echeclus.uberspace.de
 TARGET_DIR = packages/socialrunclubs.de
 
 all:
+	@echo "make check      -> run testing and linting"
 	@echo "make sync       -> build and upload to socialrunclubs.de"
 	@echo "make run-remote -> sync & run remote script"
 
 .bin/generate-linux: cmd/generate/main.go go.mod internal/utils/*.go internal/app/*.go templates/*.html templates/parts/*.html
 	mkdir -p .bin
 	GOOS=linux GOARCH=amd64 go build -o .bin/generate-linux cmd/generate/main.go
+
+.phnoy: check
+check:
+	go test -v ./...
+	go vet ./...
 
 .phony: get-images
 get-images:

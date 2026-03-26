@@ -67,26 +67,29 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	}
 
 	// leaflet marker cluster
-	markerClusterJS, err := download("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js", "static/marker-cluster.HASH.js", config)
+	markerClusterUrl := "https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist"
+	markerClusterJS, err := download(markerClusterUrl+"/leaflet.markercluster.min.js", "static/marker-cluster.HASH.js", config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("download marker-cluster.js: %w", err)
 	}
 	jsFiles = append(jsFiles, markerClusterJS)
 
-	markerClusterCSS, err := download("https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", config)
+	markerClusterCSS, err := download(markerClusterUrl+"/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", config)
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("download marker-cluster.css: %w", err)
 	}
 	cssFiles = append(cssFiles, markerClusterCSS)
 
 	// leaflet gesture handling
-	gestureHandlingJS, err := download("https://raw.githubusercontent.com/elmarquis/Leaflet.GestureHandling/refs/heads/master/dist/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", config)
+	gestureHandlingUrl := "https://cdn.jsdelivr.net/npm/@gstat/leaflet-gesture-handling@1.2.8/dist"
+	gestureHandlingJS, err := download(gestureHandlingUrl+"/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.js: %w", err)
 	}
 	jsFiles = append(jsFiles, gestureHandlingJS)
 
-	gestureHandlingCSS, err := download("https://raw.githubusercontent.com/elmarquis/Leaflet.GestureHandling/refs/heads/master/dist/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", config)
+	gestureHandlingCSS, err := download(gestureHandlingUrl+"/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.css: %w", err)
 	}

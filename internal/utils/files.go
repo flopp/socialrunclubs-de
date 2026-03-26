@@ -63,11 +63,3 @@ func CopyFile(src, dst string) error {
 func CopyHash(src, dst string) (string, error) {
 	return filehash.Copy(src, dst, "HASH")
 }
-
-func MustCopyHash(src, dst string) string {
-	res, err := CopyHash(src, dst)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}

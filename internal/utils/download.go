@@ -57,20 +57,33 @@ func Download(url string, dst string) error {
 }
 
 func DownloadHash(url string, dst string) (string, error) {
-	if strings.Contains(dst, "HASH") {
-		tmpfile, err := os.CreateTemp("", "")
-		if err != nil {
-			return "", err
-		}
-		defer os.Remove(tmpfile.Name())
-
-		err = Download(url, tmpfile.Name())
-		if err != nil {
-			return "", err
-		}
-
-		return CopyHash(tmpfile.Name(), dst)
-	} else {
-		return dst, Download(url, dst)
+	// Always download to a temporary file first
+	tmpfile, err := os.CreateTemp("", "")
+	if err != nil {
+		return "", fmt.Errorf("create temp file: %w", err)
 	}
+	defer os.Remove(tmpfile.Name())
+
+	err = Download(url, tmpfile.Name())
+	if err != nil {
+		return "", err
+	}
+
+	// If destination contains HASH, use CopyHash for hash-based naming
+	if strings.Contains(dst, "HASH") {
+		return CopyHash(tmpfile.Name(), dst)
+	}
+
+	// Ensure destination directory exists before renaming
+	err = os.MkdirAll(filepath.Dir(dst), 0770)
+	if err != nil {
+		return "", fmt.Errorf("create destination directory: %w", err)
+	}
+
+	// Otherwise, rename temp file to final destination
+	err = os.Rename(tmpfile.Name(), dst)
+	if err != nil {
+		return "", fmt.Errorf("rename temp file: %w", err)
+	}
+	return dst, nil
 }

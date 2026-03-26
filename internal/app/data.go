@@ -170,8 +170,25 @@ type Data struct {
 
 func (d *Data) RandomizedClubs() []*Club {
 	// Create a copy of the clubs slice
-	clubs := make([]*Club, len(d.Clubs))
-	copy(clubs, d.Clubs)
+	clubs := make([]*Club, 0, len(d.Clubs))
+	// only 1 parkrun & 1 kraft runners
+	parkruns := 0
+	kraftRunners := 0
+	for _, club := range d.Clubs {
+		if strings.Contains(strings.ToLower(club.Name), "parkrun") {
+			parkruns++
+			if parkruns > 1 {
+				continue
+			}
+		}
+		if strings.Contains(strings.ToLower(club.Name), "kraft") {
+			kraftRunners++
+			if kraftRunners > 1 {
+				continue
+			}
+		}
+		clubs = append(clubs, club)
+	}
 
 	// Shuffle the clubs slice
 	rand.Shuffle(len(clubs), func(i, j int) {

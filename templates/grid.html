@@ -1,10 +1,19 @@
+<!--
+
+1080x1350
+30 -> 36x45 = 1620
+45 -> 24x30 = 720
+54 -> 20x25 = 500
+
+-->
+
 {{template "header.html" .}}
 
 <section>
-    <div class="dense-grid">
+    <div class="dense-grid" style="max-width: 1080px;">
         {{range .Data.RandomizedClubs}}
         {{if .InstagramProfile}}
-            <img src="{{BasePath .Image}}" width=40 height="40">
+            <img src="{{BasePath .Image}}" width=45 height=45>
         {{end}}
         {{end}}
     </div>

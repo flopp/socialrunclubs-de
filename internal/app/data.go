@@ -166,25 +166,32 @@ type Data struct {
 }
 
 func (d *Data) RandomizedClubs() []*Club {
-	// Create a copy of the clubs slice
+	// Filter out clubs based on name patterns (limit to 1 per pattern)
+	excludedPatterns := map[string]int{
+		"parkrun": 1,
+		"kraft":   1,
+	}
+
 	clubs := make([]*Club, 0, len(d.Clubs))
-	// only 1 parkrun & 1 kraft runners
-	parkruns := 0
-	kraftRunners := 0
+	patternCounts := make(map[string]int)
+
 	for _, club := range d.Clubs {
-		if strings.Contains(strings.ToLower(club.Name), "parkrun") {
-			parkruns++
-			if parkruns > 1 {
-				continue
+		clubNameLower := strings.ToLower(club.Name)
+		shouldExclude := false
+
+		for pattern, maxCount := range excludedPatterns {
+			if strings.Contains(clubNameLower, pattern) {
+				if patternCounts[pattern] >= maxCount {
+					shouldExclude = true
+					break
+				}
+				patternCounts[pattern]++
 			}
 		}
-		if strings.Contains(strings.ToLower(club.Name), "kraft") {
-			kraftRunners++
-			if kraftRunners > 1 {
-				continue
-			}
+
+		if !shouldExclude {
+			clubs = append(clubs, club)
 		}
-		clubs = append(clubs, club)
 	}
 
 	// Shuffle the clubs slice
@@ -227,6 +234,60 @@ func getVal(colName string, row []string, colIdx map[string]int) (string, error)
 		return "", nil
 	}
 	return strings.TrimSpace(row[col]), nil
+}
+
+func sortCitiesAndClubs(cities []*City) {
+	sort.Slice(cities, func(i, j int) bool {
+		return cities[i].Slug() < cities[j].Slug()
+	})
+	for _, city := range cities {
+		sort.Slice(city.Clubs, func(i, j int) bool {
+			return city.Clubs[i].Slug() < city.Clubs[j].Slug()
+		})
+	}
+}
+
+func sortTagsAndClubs(tags []*Tag) {
+	sort.Slice(tags, func(i, j int) bool {
+		return tags[i].Slug() < tags[j].Slug()
+	})
+	for _, tag := range tags {
+		sort.Slice(tag.Clubs, func(i, j int) bool {
+			// sort by name + city name
+			n1 := tag.Clubs[i].SanitizeName()
+			n2 := tag.Clubs[j].SanitizeName()
+			if n1 != n2 {
+				return n1 < n2
+			}
+			// fallback to city
+			return tag.Clubs[i].City.SanitizeName() < tag.Clubs[j].City.SanitizeName()
+		})
+	}
+}
+
+func sortClubs(clubs []*Club) {
+	sort.Slice(clubs, func(i, j int) bool {
+		// sort by name + city name
+		n1 := clubs[i].SanitizeName()
+		n2 := clubs[j].SanitizeName()
+		if n1 != n2 {
+			return n1 < n2
+		}
+		// fallback to city
+		return clubs[i].City.SanitizeName() < clubs[j].City.SanitizeName()
+	})
+}
+
+func checkForDuplicateClubs(clubs []*Club) {
+	seen := make(map[string]*Club)
+	for _, club := range clubs {
+		key := club.Slug()
+		if _, exists := seen[key]; exists {
+			log.Printf("duplicate club found with slug: %s", key)
+		} else {
+			seen[key] = club
+		}
+	}
 }
 
 func processClubsSheet(sheet utils.Sheet, data *Data) error {
@@ -525,101 +586,58 @@ func GetData(config Config) (*Data, error) {
 	}
 
 	// get the clubs and cities sheets
-	clubsFound := false
-	citiesFound := false
-	tagsFound := false
+	var clubsFound, citiesFound, tagsFound bool
+
+	// Define sheet processors
+	type sheetProcessor struct {
+		processFunc func(utils.Sheet, *Data) error
+		found       *bool
+	}
+
+	processors := map[string]*sheetProcessor{
+		"CLUBS":  {processFunc: processClubsSheet, found: &clubsFound},
+		"CITIES": {processFunc: processCitiesSheet, found: &citiesFound},
+		"TAGS":   {processFunc: processTagsSheet, found: &tagsFound},
+	}
+
+	// Process sheets
 	for _, sheet := range sheets {
-		switch sheet.Name {
-		case "CLUBS":
-			clubsFound = true
-			if err := processClubsSheet(sheet, data); err != nil {
-				return nil, fmt.Errorf("processing clubs sheet: %v", err)
+		if processor, exists := processors[sheet.Name]; exists {
+			*processor.found = true
+			if err := processor.processFunc(sheet, data); err != nil {
+				return nil, fmt.Errorf("processing %s sheet: %v", sheet.Name, err)
 			}
-		case "CITIES":
-			citiesFound = true
-			if err := processCitiesSheet(sheet, data); err != nil {
-				return nil, fmt.Errorf("processing cities sheet: %v", err)
-			}
-		case "TAGS":
-			tagsFound = true
-			if err := processTagsSheet(sheet, data); err != nil {
-				return nil, fmt.Errorf("processing tags sheet: %v", err)
-			}
-		case "SUBMIT":
-			// ignore
-		case "REPORT":
-			// ignore
-		default:
-			if strings.Contains(sheet.Name, "IGNORE") {
-				continue
-			}
+		} else if sheet.Name == "SUBMIT" || sheet.Name == "REPORT" || strings.Contains(sheet.Name, "IGNORE") {
+			// ignore these sheets
+			continue
+		} else {
 			return nil, fmt.Errorf("unknown sheet name: %s", sheet.Name)
 		}
 	}
 
-	if !clubsFound {
-		return nil, fmt.Errorf("missing clubs sheet")
-	}
-	if !citiesFound {
-		return nil, fmt.Errorf("missing cities sheet")
-	}
-	if !tagsFound {
-		return nil, fmt.Errorf("missing tags sheet")
+	// Check required sheets
+	requiredSheets := []string{"CLUBS", "CITIES", "TAGS"}
+	for _, sheetName := range requiredSheets {
+		if processor := processors[sheetName]; !*processor.found {
+			return nil, fmt.Errorf("missing %s sheet", sheetName)
+		}
 	}
 
 	// sorting of cities
-	sort.Slice(data.Cities, func(i, j int) bool {
-		return data.Cities[i].Slug() < data.Cities[j].Slug()
-	})
-	for _, city := range data.Cities {
-		sort.Slice(city.Clubs, func(i, j int) bool {
-			return city.Clubs[i].Slug() < city.Clubs[j].Slug()
-		})
-	}
+	sortCitiesAndClubs(data.Cities)
 
 	// sorting of tags
-	sort.Slice(data.Tags, func(i, j int) bool {
-		return data.Tags[i].Slug() < data.Tags[j].Slug()
-	})
-	for _, tag := range data.Tags {
-		sort.Slice(tag.Clubs, func(i, j int) bool {
-			// sort by name + city name
-			n1 := tag.Clubs[i].SanitizeName()
-			n2 := tag.Clubs[j].SanitizeName()
-			if n1 != n2 {
-				return n1 < n2
-			}
-			// fallback to city
-			return tag.Clubs[i].City.SanitizeName() < tag.Clubs[j].City.SanitizeName()
-		})
-	}
+	sortTagsAndClubs(data.Tags)
 
 	// all clubs
 	data.Clubs = make([]*Club, 0)
 	for _, city := range data.Cities {
 		data.Clubs = append(data.Clubs, city.Clubs...)
 	}
-	sort.Slice(data.Clubs, func(i, j int) bool {
-		// sort by name + city name
-		n1 := data.Clubs[i].SanitizeName()
-		n2 := data.Clubs[j].SanitizeName()
-		if n1 != n2 {
-			return n1 < n2
-		}
-		// fallback to city
-		return data.Clubs[i].City.SanitizeName() < data.Clubs[j].City.SanitizeName()
-	})
+	sortClubs(data.Clubs)
 
 	// check for duplicates (via slugs)
-	seen := make(map[string]*Club)
-	for _, club := range data.Clubs {
-		key := club.Slug()
-		if _, exists := seen[key]; exists {
-			log.Printf("duplicate club found with slug: %s", key)
-		} else {
-			seen[key] = club
-		}
-	}
+	checkForDuplicateClubs(data.Clubs)
 
 	// collect clubs by added date
 	var addedClubs []*Club

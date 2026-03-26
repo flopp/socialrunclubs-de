@@ -29,78 +29,72 @@ func download(url, target string, config Config) (string, error) {
 	return t, nil
 }
 
+func fetchAsset(url string, targetFile string, cssFiles *[]string, jsFiles *[]string, config Config) error {
+	assetPath, err := download(url, targetFile, config)
+	if err != nil {
+		return err
+	}
+
+	if filepath.Ext(assetPath) == ".css" {
+		*cssFiles = append(*cssFiles, assetPath)
+	} else if filepath.Ext(assetPath) == ".js" {
+		*jsFiles = append(*jsFiles, assetPath)
+	}
+
+	return nil
+}
+
 func CopyAssets(config Config) ([]string, []string, error) {
 	cssFiles := make([]string, 0)
 	jsFiles := make([]string, 0)
 
+	jsDelivr := "https://cdn.jsdelivr.net/npm"
+	picoCssUrl := jsDelivr + "/@picocss/pico@2"
+	leafletUrl := jsDelivr + "/leaflet@1.9.4/dist"
+	markerClusterUrl := jsDelivr + "/leaflet.markercluster@1.5.3/dist"
+	gestureHandlingUrl := jsDelivr + "/@gstat/leaflet-gesture-handling@1.2.8/dist"
+
 	// fetch additional assets from remote server
-	picocss, err := download("https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css", "static/pico.HASH.css", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download pico.min.css: %w", err)
+	if err := fetchAsset(picoCssUrl+"/css/pico.min.css", "static/pico.HASH.css", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch pico.min.css: %w", err)
 	}
-	cssFiles = append(cssFiles, picocss)
 
 	// leaflet
-	leafletUrl := "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist"
-	leafletCSS, err := download(leafletUrl+"/leaflet.min.css", "static/leaflet.HASH.css", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download leaflet.css: %w", err)
+	if err := fetchAsset(leafletUrl+"/leaflet.min.css", "static/leaflet.HASH.css", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch leaflet.min.css: %w", err)
 	}
-	cssFiles = append(cssFiles, leafletCSS)
-
-	leafletJS, err := download(leafletUrl+"/leaflet.min.js", "static/leaflet.HASH.js", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download leaflet.js: %w", err)
+	if err := fetchAsset(leafletUrl+"/leaflet.min.js", "static/leaflet.HASH.js", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch leaflet.min.js: %w", err)
 	}
-	jsFiles = append(jsFiles, leafletJS)
-
-	if _, err := download(leafletUrl+"/images/marker-icon.png", "static/images/marker-icon.png", config); err != nil {
-		return nil, nil, fmt.Errorf("download marker-icon.png: %w", err)
+	if err := fetchAsset(leafletUrl+"/images/marker-icon.png", "static/images/marker-icon.png", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch marker-icon.png: %w", err)
 	}
-
-	if _, err := download(leafletUrl+"/images/marker-icon-2x.png", "static/images/marker-icon-2x.png", config); err != nil {
-		return nil, nil, fmt.Errorf("download marker-icon-2x.png: %w", err)
+	if err := fetchAsset(leafletUrl+"/images/marker-icon-2x.png", "static/images/marker-icon-2x.png", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch marker-icon-2x.png: %w", err)
 	}
-
-	if _, err := download(leafletUrl+"/images/marker-shadow.png", "static/images/marker-shadow.png", config); err != nil {
-		return nil, nil, fmt.Errorf("download marker-shadow.png: %w", err)
+	if err := fetchAsset(leafletUrl+"/images/marker-shadow.png", "static/images/marker-shadow.png", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch marker-shadow.png: %w", err)
 	}
 
 	// leaflet marker cluster
-	markerClusterUrl := "https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist"
-	markerClusterJS, err := download(markerClusterUrl+"/leaflet.markercluster.min.js", "static/marker-cluster.HASH.js", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download marker-cluster.js: %w", err)
+	if err := fetchAsset(markerClusterUrl+"/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch marker-cluster.css: %w", err)
 	}
-	jsFiles = append(jsFiles, markerClusterJS)
-
-	markerClusterCSS, err := download(markerClusterUrl+"/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", config)
-
-	if err != nil {
-		return nil, nil, fmt.Errorf("download marker-cluster.css: %w", err)
+	if err := fetchAsset(markerClusterUrl+"/leaflet.markercluster.min.js", "static/marker-cluster.HASH.js", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch marker-cluster.js: %w", err)
 	}
-	cssFiles = append(cssFiles, markerClusterCSS)
-
 	// leaflet gesture handling
-	gestureHandlingUrl := "https://cdn.jsdelivr.net/npm/@gstat/leaflet-gesture-handling@1.2.8/dist"
-	gestureHandlingJS, err := download(gestureHandlingUrl+"/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.js: %w", err)
+	if err := fetchAsset(gestureHandlingUrl+"/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch leaflet-gesture-handling.js: %w", err)
 	}
-	jsFiles = append(jsFiles, gestureHandlingJS)
-
-	gestureHandlingCSS, err := download(gestureHandlingUrl+"/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download leaflet-gesture-handling.css: %w", err)
+	if err := fetchAsset(gestureHandlingUrl+"/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch leaflet-gesture-handling.css: %w", err)
 	}
-	cssFiles = append(cssFiles, gestureHandlingCSS)
 
 	// umami
-	umamiJS, err := download("https://cloud.umami.is/script.js", "static/umami.HASH.js", config)
-	if err != nil {
-		return nil, nil, fmt.Errorf("download umami.js: %w", err)
+	if err := fetchAsset("https://cloud.umami.is/script.js", "static/umami.HASH.js", &cssFiles, &jsFiles, config); err != nil {
+		return nil, nil, fmt.Errorf("fetch umami.js: %w", err)
 	}
-	jsFiles = append(jsFiles, umamiJS)
 
 	// copy static files to output directory
 	styleCSS, err := utils.CopyHash("static/style.css", filepath.Join(config.OutputDir, "static", "style.HASH.css"))

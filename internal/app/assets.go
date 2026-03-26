@@ -54,46 +54,30 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	markerClusterUrl := jsDelivr + "/leaflet.markercluster@1.5.3/dist"
 	gestureHandlingUrl := jsDelivr + "/@gstat/leaflet-gesture-handling@1.2.8/dist"
 
+	type Asset struct {
+		URL    string
+		Target string
+	}
+
+	assets := []Asset{
+		{picoCssUrl + "/css/pico.min.css", "static/pico.HASH.css"},
+		{leafletUrl + "/leaflet.min.css", "static/leaflet.HASH.css"},
+		{leafletUrl + "/leaflet.min.js", "static/leaflet.HASH.js"},
+		{leafletUrl + "/images/marker-icon.png", "static/images/marker-icon.png"},
+		{leafletUrl + "/images/marker-icon-2x.png", "static/images/marker-icon-2x.png"},
+		{leafletUrl + "/images/marker-shadow.png", "static/images/marker-shadow.png"},
+		{markerClusterUrl + "/MarkerCluster.Default.css", "static/marker-cluster.HASH.css"},
+		{markerClusterUrl + "/leaflet.markercluster.min.js", "static/marker-cluster.HASH.js"},
+		{gestureHandlingUrl + "/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js"},
+		{gestureHandlingUrl + "/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css"},
+		{"https://cloud.umami.is/script.js", "static/umami.HASH.js"},
+	}
+
 	// fetch additional assets from remote server
-	if err := fetchAsset(picoCssUrl+"/css/pico.min.css", "static/pico.HASH.css", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch pico.min.css: %w", err)
-	}
-
-	// leaflet
-	if err := fetchAsset(leafletUrl+"/leaflet.min.css", "static/leaflet.HASH.css", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch leaflet.min.css: %w", err)
-	}
-	if err := fetchAsset(leafletUrl+"/leaflet.min.js", "static/leaflet.HASH.js", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch leaflet.min.js: %w", err)
-	}
-	if err := fetchAsset(leafletUrl+"/images/marker-icon.png", "static/images/marker-icon.png", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch marker-icon.png: %w", err)
-	}
-	if err := fetchAsset(leafletUrl+"/images/marker-icon-2x.png", "static/images/marker-icon-2x.png", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch marker-icon-2x.png: %w", err)
-	}
-	if err := fetchAsset(leafletUrl+"/images/marker-shadow.png", "static/images/marker-shadow.png", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch marker-shadow.png: %w", err)
-	}
-
-	// leaflet marker cluster
-	if err := fetchAsset(markerClusterUrl+"/MarkerCluster.Default.css", "static/marker-cluster.HASH.css", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch marker-cluster.css: %w", err)
-	}
-	if err := fetchAsset(markerClusterUrl+"/leaflet.markercluster.min.js", "static/marker-cluster.HASH.js", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch marker-cluster.js: %w", err)
-	}
-	// leaflet gesture handling
-	if err := fetchAsset(gestureHandlingUrl+"/leaflet-gesture-handling.min.js", "static/leaflet-gesture-handling.HASH.js", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch leaflet-gesture-handling.js: %w", err)
-	}
-	if err := fetchAsset(gestureHandlingUrl+"/leaflet-gesture-handling.min.css", "static/leaflet-gesture-handling.HASH.css", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch leaflet-gesture-handling.css: %w", err)
-	}
-
-	// umami
-	if err := fetchAsset("https://cloud.umami.is/script.js", "static/umami.HASH.js", &cssFiles, &jsFiles, config); err != nil {
-		return nil, nil, fmt.Errorf("fetch umami.js: %w", err)
+	for _, asset := range assets {
+		if err := fetchAsset(asset.URL, asset.Target, &cssFiles, &jsFiles, config); err != nil {
+			return nil, nil, fmt.Errorf("fetch %s: %w", asset.Target, err)
+		}
 	}
 
 	// copy static files to output directory

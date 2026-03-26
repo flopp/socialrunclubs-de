@@ -89,11 +89,8 @@ type Club struct {
 	Name           string
 	DescriptionRaw string
 	Description    *template.HTML
-	tagsRaw        []string
 	Tags           []*Tag
-	CityRaw        string
 	City           *City
-	LatLonRaw      string
 	LatLon         *utils.LatLon
 	Instagram      string
 	StravaClub     string
@@ -247,49 +244,38 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 	for index, row := range sheet.Rows[1:] {
 		club := &Club{}
 
-		if club.Name, err = getVal("NAME", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
+		// Define field mappings for direct assignment
+		type fieldMapping struct {
+			field *string // pointer to string field
+			col   string
 		}
-		if club.DescriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
+
+		cityRaw := ""
+		latLonRaw := ""
 		tagsRaw := ""
-		if tagsRaw, err = getVal("TAGS", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
+
+		mappings := []fieldMapping{
+			{&club.Name, "NAME"},
+			{&club.DescriptionRaw, "DESCRIPTION"},
+			{&cityRaw, "CITY"},
+			{&latLonRaw, "COORDS"},
+			{&club.Instagram, "INSTAGRAM_URL"},
+			{&club.StravaClub, "STRAVA_URL"},
+			{&club.Whatsapp, "WHATSAPP_URL"},
+			{&club.Website, "WEBSITE_URL"},
+			{&club.AddedRaw, "ADDED"},
+			{&club.UpdatedRaw, "UPDATED"},
+			{&club.StatusRaw, "STATUS"},
+			{&tagsRaw, "TAGS"},
 		}
-		club.tagsRaw = utils.SplitAndTrim(tagsRaw, ",")
-		if club.DescriptionRaw, err = getVal("DESCRIPTION", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.CityRaw, err = getVal("CITY", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.LatLonRaw, err = getVal("COORDS", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.Instagram, err = getVal("INSTAGRAM_URL", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.StravaClub, err = getVal("STRAVA_URL", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.StravaClub, err = getVal("STRAVA_URL", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.Whatsapp, err = getVal("WHATSAPP_URL", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.Website, err = getVal("WEBSITE_URL", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.AddedRaw, err = getVal("ADDED", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.UpdatedRaw, err = getVal("UPDATED", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
-		}
-		if club.StatusRaw, err = getVal("STATUS", row, colIdx); err != nil {
-			return fmt.Errorf("row %d: %v", index+2, err)
+
+		// Process direct field assignments
+		for _, mapping := range mappings {
+			if val, err := getVal(mapping.col, row, colIdx); err != nil {
+				return fmt.Errorf("row %d: %v", index+2, err)
+			} else {
+				*mapping.field = val
+			}
 		}
 
 		// skip invalid clubs
@@ -297,8 +283,8 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			log.Printf("CLUBS row %d: empty club name: %q", index+2, club.Name)
 			continue
 		}
-		if club.CityRaw == "" {
-			log.Printf("CLUBS row %d: empty city name: %q", index+2, club.CityRaw)
+		if cityRaw == "" {
+			log.Printf("CLUBS row %d: empty city name: %q", index+2, cityRaw)
 			continue
 		}
 
@@ -313,7 +299,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 				return fmt.Errorf("row %d: %v", index+2, err)
 			}
 			if redirectName != "" && redirectCity != "" {
-				from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
+				from := fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name))
 				to := fmt.Sprintf("/%s/%s", utils.SanitizeName(redirectCity), utils.SanitizeName(redirectName))
 				data.redirect(from, to)
 			}
@@ -326,8 +312,8 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			return fmt.Errorf("row %d: %v", index+2, err)
 		}
 		if oldName != "" {
-			from := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(oldName))
-			to := fmt.Sprintf("/%s/%s", utils.SanitizeName(club.CityRaw), utils.SanitizeName(club.Name))
+			from := fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(oldName))
+			to := fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name))
 			data.redirect(from, to)
 		}
 
@@ -335,10 +321,10 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 		descriptionHtml := template.HTML(club.DescriptionRaw)
 		club.Description = &descriptionHtml
 
-		if club.LatLonRaw != "" {
-			latlon, err := utils.ParseLatLon(club.LatLonRaw)
+		if latLonRaw != "" {
+			latlon, err := utils.ParseLatLon(latLonRaw)
 			if err != nil {
-				log.Printf("CLUBS row %d: invalid coords: %q", index+2, club.LatLonRaw)
+				log.Printf("CLUBS row %d: invalid coords: %q", index+2, latLonRaw)
 				continue
 			}
 			club.LatLon = &latlon
@@ -353,15 +339,15 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 			club.UpdatedRaw = ""
 		}
 
-		if city, found := data.CityMap[club.CityRaw]; found {
+		if city, found := data.CityMap[cityRaw]; found {
 			city.Clubs = append(city.Clubs, club)
 			club.City = city
 		} else {
 			if hasCities {
-				log.Printf("CLUBS row %d: unknown city: %q", index+2, club.CityRaw)
+				log.Printf("CLUBS row %d: unknown city: %q", index+2, cityRaw)
 			}
 			city = &City{
-				Name:                 club.CityRaw,
+				Name:                 cityRaw,
 				Clubs:                []*Club{club},
 				SizeIndexWithoutClub: 0,
 			}
@@ -372,7 +358,7 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 
 		// process tags
 		club.Tags = make([]*Tag, 0)
-		for _, tagName := range club.tagsRaw {
+		for _, tagName := range utils.SplitAndTrim(tagsRaw, ",") {
 			tag := data.getOrAddTag(tagName)
 			tag.Clubs = append(tag.Clubs, club)
 			club.Tags = append(club.Tags, tag)

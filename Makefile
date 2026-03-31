@@ -38,7 +38,8 @@ backup:
 sync: .repo/.git/config .bin/generate-linux
 	(cd .repo && git pull --quiet)
 	rsync -a production.json scripts/cronjob.sh .bin/generate-linux $(SERVER):$(TARGET_DIR)/
-	rsync -a .images/ $(SERVER):$(TARGET_DIR)/images	
+	rsync -a .images/ $(SERVER):$(TARGET_DIR)/images
+	rsync -a club-images/ $(SERVER):$(TARGET_DIR)/images
 	rsync -a .repo/ $(SERVER):$(TARGET_DIR)/repo
 	ssh $(SERVER) chmod +x $(TARGET_DIR)/cronjob.sh $(TARGET_DIR)/generate-linux
 

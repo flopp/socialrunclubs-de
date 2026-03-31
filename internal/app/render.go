@@ -294,13 +294,19 @@ func copyClubImage(config Config, club *Club, targetPath string) error {
 			if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
 				return fmt.Errorf("copying Instagram image for club %q: %w", club.Name, err)
 			}
-		} else {
-			return copyPlaceholderImage(config, targetPath)
+			return nil
 		}
-	} else {
-		return copyPlaceholderImage(config, targetPath)
 	}
-	return nil
+
+	cachedImagName := filepath.Join(config.ImageDir, club.City.SanitizeName(), club.SanitizeName()+".jpg")
+	if utils.FileExists(cachedImagName) {
+		if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
+			return fmt.Errorf("copying direct image for club %q: %w", club.Name, err)
+		}
+		return nil
+	}
+
+	return copyPlaceholderImage(config, targetPath)
 }
 
 func Render(data *Data, cssFiles, jsFiles []string, config Config) error {

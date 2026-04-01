@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eu
+
+SOURCE=$1
+TARGET=$2
+
+mkdir -p $(dirname "$TARGET")
+
+magick convert -resize 100x100 "$SOURCE" "$TARGET"

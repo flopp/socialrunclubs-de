@@ -89,5 +89,7 @@ func main() {
 			}
 			continue
 		}
+
+		log.Printf("No image found for club %s in city %s -> %s", item.Name, item.City.Name, directImage)
 	}
 }

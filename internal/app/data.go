@@ -1,18 +1,19 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"log"
 	"math/rand/v2"
+	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
 
-	"os"
-
+	googlesheetswrapper "github.com/flopp/go-googlesheetswrapper"
 	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
 
@@ -290,19 +291,19 @@ func checkForDuplicateClubs(clubs []*Club) {
 	}
 }
 
-func processClubsSheet(sheet utils.Sheet, data *Data) error {
-	if len(sheet.Rows) == 0 {
+func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
+	if len(rows) == 0 {
 		return fmt.Errorf("sheet is empty")
 	}
 
 	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WHATSAPP_URL", "WEBSITE_URL"}
-	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
+	colIdx, err := googlesheetswrapper.ExtractHeader(rows[:1], required, false)
 	if err != nil {
 		return err
 	}
 
 	hasCities := len(data.Cities) > 0
-	for index, row := range sheet.Rows[1:] {
+	for index, row := range rows[1:] {
 		club := &Club{}
 
 		// Define field mappings for direct assignment
@@ -429,13 +430,13 @@ func processClubsSheet(sheet utils.Sheet, data *Data) error {
 	return nil
 }
 
-func processCitiesSheet(sheet utils.Sheet, data *Data) error {
-	if len(sheet.Rows) == 0 {
+func processCitiesSheet(sheetName string, rows [][]string, data *Data) error {
+	if len(rows) == 0 {
 		return fmt.Errorf("sheet is empty")
 	}
 
 	required := []string{"NAME"}
-	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
+	colIdx, err := googlesheetswrapper.ExtractHeader(rows[:1], required, false)
 	if err != nil {
 		return err
 	}
@@ -443,7 +444,7 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	cities := make(map[string]struct{})
 	cityList := make([]string, 0)
 
-	for index, row := range sheet.Rows[1:] {
+	for index, row := range rows[1:] {
 		name := ""
 
 		if name, err = getVal("NAME", row, colIdx); err != nil {
@@ -486,18 +487,18 @@ func processCitiesSheet(sheet utils.Sheet, data *Data) error {
 	return nil
 }
 
-func processTagsSheet(sheet utils.Sheet, data *Data) error {
-	if len(sheet.Rows) == 0 {
+func processTagsSheet(sheetName string, rows [][]string, data *Data) error {
+	if len(rows) == 0 {
 		return fmt.Errorf("sheet is empty")
 	}
 
 	required := []string{"NAME", "FANCY", "DESCRIPTION"}
-	colIdx, err := utils.ValidateColumns(sheet.Rows[0], required)
+	colIdx, err := googlesheetswrapper.ExtractHeader(rows[:1], required, false)
 	if err != nil {
 		return err
 	}
 
-	for index, row := range sheet.Rows[1:] {
+	for index, row := range rows[1:] {
 		name := ""
 
 		if name, err = getVal("NAME", row, colIdx); err != nil {
@@ -578,8 +579,17 @@ func GetData(config Config) (*Data, error) {
 		NumberClubs: 0,
 	}
 
-	sheets, err := utils.Retry(3, 8*time.Second, func() ([]utils.Sheet, error) {
-		return utils.GetSheets(config.Google.APIKey, config.Google.SheetId)
+	sheetData, err := utils.Retry(3, 8*time.Second, func() (map[string][][]string, error) {
+		ctx := context.Background()
+		client, err := googlesheetswrapper.New(config.Google.APIKey, config.Google.SheetId)
+		if err != nil {
+			return nil, fmt.Errorf("creating sheets client: %w", err)
+		}
+		all, err := client.ReadAll(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("reading all sheets: %w", err)
+		}
+		return all, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("getting sheets: %v", err)
@@ -590,7 +600,7 @@ func GetData(config Config) (*Data, error) {
 
 	// Define sheet processors
 	type sheetProcessor struct {
-		processFunc func(utils.Sheet, *Data) error
+		processFunc func(string, [][]string, *Data) error
 		found       *bool
 	}
 
@@ -601,17 +611,17 @@ func GetData(config Config) (*Data, error) {
 	}
 
 	// Process sheets
-	for _, sheet := range sheets {
-		if processor, exists := processors[sheet.Name]; exists {
+	for name, rows := range sheetData {
+		if processor, exists := processors[name]; exists {
 			*processor.found = true
-			if err := processor.processFunc(sheet, data); err != nil {
-				return nil, fmt.Errorf("processing %s sheet: %v", sheet.Name, err)
+			if err := processor.processFunc(name, rows, data); err != nil {
+				return nil, fmt.Errorf("processing %s sheet: %v", name, err)
 			}
-		} else if sheet.Name == "SUBMIT" || sheet.Name == "REPORT" || strings.Contains(sheet.Name, "IGNORE") {
+		} else if name == "SUBMIT" || name == "REPORT" || strings.Contains(name, "IGNORE") {
 			// ignore these sheets
 			continue
 		} else {
-			return nil, fmt.Errorf("unknown sheet name: %s", sheet.Name)
+			return nil, fmt.Errorf("unknown sheet name: %s", name)
 		}
 	}
 

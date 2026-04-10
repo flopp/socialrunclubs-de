@@ -25,7 +25,7 @@ func NewCachingGeocoder(download func(url string, targetPath string) error, cach
 
 type geocoderCacheData map[string]LatLon
 
-func (g *CachingGeocoder) LookupOSM(address string) (LatLon, error) {
+func (g *CachingGeocoder) lookupOSM(address string) (LatLon, error) {
 	<-g.rateLimiter
 
 	location, err := g.geocoder.Geocode(address)
@@ -78,7 +78,7 @@ func (g *CachingGeocoder) Lookup(city string) (LatLon, error) {
 	}
 
 	log.Printf("geocoder: looking up '%s'", city)
-	coords, err := g.LookupOSM(fmt.Sprintf("%s, Germany", city))
+	coords, err := g.lookupOSM(fmt.Sprintf("%s, Germany", city))
 	if err != nil {
 		return LatLon{}, err
 	}

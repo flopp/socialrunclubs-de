@@ -145,7 +145,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			OutFile:     "cities-no-club.html",
 		},
 		{
-			Title:       "Alphabetische Liste deutscher Social Run Clubs",
+			Title:       "Liste aller Social Run Clubs in Deutschland",
 			Description: "Eine Übersicht über alle Social Run Clubs in Deutschland.",
 			Canonical:   "/clubs.html",
 			Template:    "clubs.html",

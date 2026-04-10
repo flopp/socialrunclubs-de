@@ -114,5 +114,10 @@ func CopyAssets(config Config) ([]string, []string, error) {
 		}
 	}
 
+	// copy llms.txt to output directory root
+	if err := utils.CopyFile("static/llms.txt", filepath.Join(config.OutputDir, "llms.txt")); err != nil {
+		return nil, nil, fmt.Errorf("copy static file %s: %w", "static/llms.txt", err)
+	}
+
 	return cssFiles, jsFiles, nil
 }

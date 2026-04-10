@@ -1,0 +1,20 @@
+# socialrunclubs.de
+
+> A directory of Social Run Clubs in Germany.
+
+socialrunclubs.de is a website that lists Social Run Clubs across Germany.
+It provides an overview of running communities by city, with information about each club including descriptions, links to Instagram, Strava, WhatsApp, and club websites, as well as maps of meeting points.
+
+## Pages
+
+- [Home](https://socialrunclubs.de/): Overview and search for Social Run Clubs in Germany
+- [All Cities](https://socialrunclubs.de/cities.html): Browse Social Run Clubs by city
+- [All Clubs](https://socialrunclubs.de/clubs.html): Alphabetical list of all Social Run Clubs in Germany
+- [Tags](https://socialrunclubs.de/tags.html): Browse Social Run Clubs by category/tag
+- [Blog Posts](https://socialrunclubs.de/post/): Articles about Social Run Clubs
+
+## Technical Notes
+
+- Data is sourced from a Google Sheets spreadsheet and regenerated regularly
+- Site is a statically generated HTML website
+- Source code: https://github.com/flopp/socialrunclubs-de

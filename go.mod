@@ -8,6 +8,7 @@ require (
 	github.com/codingsince1985/geo-golang v1.8.5
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258
+	github.com/flopp/go-googlesheetswrapper v0.0.0-20260406112809-7c5a6afecd10
 	golang.org/x/text v0.35.0
 	google.golang.org/api v0.274.0
 )
@@ -18,7 +19,6 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/flopp/go-googlesheetswrapper v0.0.0-20260406112809-7c5a6afecd10 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect

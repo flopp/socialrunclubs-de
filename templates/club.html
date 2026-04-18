@@ -21,7 +21,7 @@
     {{if .Club.Tags}}<p>
         Kategorien:
         <ul>
-            {{range .Club.Tags}}<li><a href="{{BasePath .Slug}}">{{.Name}}</a>{{if .Description}}: {{.Description}}{{end}}</li>{{end}}
+            {{range .Club.Tags}}<li><b>{{.Name}}</b>{{if .Description}}: {{.Description}}{{end}}<br>👉 <a href="{{BasePath .Slug}}">zur Kategorie</a></li>{{end}}
         </ul>
     </p>{{end}}
     <p>

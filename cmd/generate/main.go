@@ -49,6 +49,7 @@ func main() {
 	// read config file from command line (e.g., config.json)
 	configFile := flag.String("config", "config.json", "Path to the config file")
 	backupFile := flag.String("backup", "", "backup sheets data to the specified file (optional)")
+	linkCheck := flag.Bool("link-check", false, "check if all club links are reachable (optional)")
 	flag.Parse()
 
 	// load config from file
@@ -69,6 +70,13 @@ func main() {
 	data, err := app.GetData(config)
 	if err != nil {
 		log.Fatalf("Error processing sheets: %v", err)
+	}
+
+	if *linkCheck {
+		if err := app.CheckLinks(data); err != nil {
+			log.Fatalf("Error checking links: %v", err)
+		}
+		return
 	}
 
 	// annotate city coordinates

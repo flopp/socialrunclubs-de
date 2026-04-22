@@ -366,7 +366,7 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 				data.redirect(fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
 				data.redirect(fmt.Sprintf("/%s/%s/", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
 				data.redirect(fmt.Sprintf("/%s/%s/index.html", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
-			} else if redirectName == "" && redirectCity == "" {
+			} else if club.StatusRaw == "obsolete" && redirectName == "" && redirectCity == "" {
 				// redirect from "city/obsolete club" to "city"
 				to := fmt.Sprintf("/%s", utils.SanitizeName(cityRaw))
 				data.redirect(fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)

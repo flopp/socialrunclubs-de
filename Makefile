@@ -34,6 +34,10 @@ backup:
 	@mkdir -p backup-data
 	go run cmd/generate/main.go -config local.json -backup backup-data/$(shell date +%Y-%m-%d).ods
 
+.phony: check-links
+check-links:
+	go run cmd/generate/main.go -config local.json -link-check
+
 .phony: sync
 sync: .repo/.git/config .bin/generate-linux
 	(cd .repo && git pull --quiet)

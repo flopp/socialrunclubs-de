@@ -30,6 +30,8 @@
     {{range .CssFiles}}<link rel="stylesheet" href="{{BasePath .}}">
     {{end}}
     {{if .Config.Umami.WebsiteId}}<script defer src="{{.UmamiJS}}" data-website-id="{{.Config.Umami.WebsiteId}}"></script>{{end}}
+    {{if .Config.Google.AnalyticsId}}<script async src="https://www.googletagmanager.com/gtag/js?id={{.Config.Google.AnalyticsId}}"></script>
+    <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '{{.Config.Google.AnalyticsId}}');</script>{{end}}
 </head>
 
 <body>

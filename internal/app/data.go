@@ -373,7 +373,6 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 					data.redirect(fmt.Sprintf("/%s/%s", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
 					data.redirect(fmt.Sprintf("/%s/%s/", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
 					data.redirect(fmt.Sprintf("/%s/%s/index.html", utils.SanitizeName(cityRaw), utils.SanitizeName(club.Name)), to)
-
 				}
 			} else {
 				log.Printf("CLUBS row %d: invalid redirect for obsolete/duplicate club: %q / %q", index+2, redirectCity, redirectName)

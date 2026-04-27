@@ -12,10 +12,11 @@ type Config struct {
 	CacheDir       string
 	ImageDir       string
 	Google         struct {
-		APIKey    string
-		SheetId   string
-		SubmitUrl string
-		ReportUrl string
+		APIKey      string
+		SheetId     string
+		SubmitUrl   string
+		ReportUrl   string
+		AnalyticsId string
 	}
 	AHrefs struct {
 		IndexNow string

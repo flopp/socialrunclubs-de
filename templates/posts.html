@@ -1,13 +1,20 @@
 {{template "header.html" .}}
 
 <section>
-    <h1>Artikel</h1>
-    <ul>
+    <h1>Rund ums Laufen</h1>
+    <p>
+        Wir haben einige Artikel rund um das Thema Laufen und Social Run Clubs zusammengestellt –
+        von den ersten Schritten als Anfänger bis hin zur Gründung eines eigenen Clubs.
+    </p>
+
+    <div class="grid">
         {{range .Data.Posts}}
-        <li>
-            <a href="{{BasePath .Slug}}">{{.Title}}</a>
-        </li>
+        <article>
+            <a href="{{BasePath .Slug}}"><strong>{{.Title}}</strong></a>
+            {{if .Description}}<p>{{.Description}}</p>{{end}}
+        </article>
         {{end}}
+    </div>
 </section>
 
 {{template "footer.html" .}}

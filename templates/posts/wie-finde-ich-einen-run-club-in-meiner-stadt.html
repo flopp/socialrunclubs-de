@@ -1,0 +1,88 @@
+{{template "header.html" .}}
+
+<!-- TITLE "Wie finde ich einen Run Club in meiner Stadt?" -->
+<!-- DESCRIPTION "So nutzt du socialrunclubs.de, um den passenden Club in deiner Nähe zu finden und einfach mitzulaufen." -->
+
+<section>
+    <article>
+        <h2>Wie finde ich einen Run Club in meiner Stadt?</h2>
+        <p>
+            Du möchtest mit anderen Menschen laufen, neue Leute kennenlernen und Teil einer aktiven Community werden?
+            socialrunclubs.de hilft dir dabei, den passenden Social Run Club in deiner Nähe zu finden. So geht's:
+        </p>
+
+        <h3>Schritt 1: Deine Stadt aufrufen</h3>
+        <p>
+            Auf der <a href="{{BasePath "/cities.html"}}">Städteübersicht</a> findest du alle Städte,
+            für die wir Run Clubs verzeichnet haben. Klicke einfach auf deine Stadt – du gelangst direkt zur
+            Übersichtsseite mit allen dort aktiven Clubs.
+        </p>
+        <p>
+            Alternativ kannst du die <a href="{{BasePath "/clubs.html"}}">Gesamtliste aller Clubs</a> aufrufen und nach
+            deiner Stadt filtern.
+        </p>
+
+        <h3>Schritt 2: Club-Profile vergleichen</h3>
+        <p>
+            Jeder Club hat eine eigene Profilseite mit hilfreichen Informationen:
+        </p>
+        <div class="grid">
+            <article>
+                <header><strong>Instagram & Strava</strong></header>
+                Die meisten Clubs kommunizieren ihre Termine und Routen über Instagram oder Strava. Über die Links auf
+                der Profilseite kommst du direkt zu den jeweiligen Profilen – dort siehst du aktuelle Posts, wann der
+                nächste Lauf stattfindet und wie aktiv die Community ist.
+            </article>
+            <article>
+                <header><strong>WhatsApp & Signal</strong></header>
+                Viele Clubs haben Gruppenlinks für WhatsApp oder Signal, über die du dich direkt anmelden und mit der
+                Community in Kontakt treten kannst. Diese Links findest du ebenfalls auf der Profilseite.
+            </article>
+            <article>
+                <header><strong>Website</strong></header>
+                Einige Clubs betreiben eine eigene Website mit detaillierten Informationen zu Terminen, Treffpunkten
+                und dem Ablauf der Läufe.
+            </article>
+        </div>
+
+        <h3>Schritt 3: Einfach mitlaufen</h3>
+        <p>
+            Social Run Clubs sind in der Regel offen für alle – ohne Anmeldung, ohne Mitgliedschaft, ohne Verpflichtung.
+            Schau auf dem Instagram-Profil oder in der WhatsApp-Gruppe nach dem nächsten Termin, tauche zum
+            Treffpunkt auf und lauf mit. So einfach ist das.
+        </p>
+        <p>
+            Falls du unsicher bist, ob der Pace oder das Format zu dir passt, schaue dir die letzten Posts auf
+            Instagram an – viele Clubs posten Fotos und Videos, die einen guten Eindruck von der Gruppe vermitteln.
+        </p>
+
+        <h3>Kein Club in deiner Stadt?</h3>
+        <p>
+            Falls du für deine Stadt keinen Eintrag findest, gibt es zwei Möglichkeiten:
+        </p>
+        <ul>
+            <li>
+                <strong>Schau auf Instagram:</strong> Suche nach Begriffen wie <em>"Run Club [Stadtname]"</em> oder
+                <em>"Social Run [Stadtname]"</em>. Vielleicht gibt es bereits einen Club, der noch nicht in unserer
+                Datenbank ist.
+            </li>
+            <li>
+                <strong>Club eintragen:</strong> Kennst du einen Club, der bei uns fehlt? Trag ihn direkt über unser
+                Formular ein – wir nehmen ihn dann gerne auf.
+            </li>
+        </ul>
+        <p>
+            <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Club jetzt eintragen</a>
+        </p>
+
+        <h3>Läufe nach Thema filtern</h3>
+        <p>
+            Interessierst du dich für Clubs mit einem bestimmten Schwerpunkt, zum Beispiel
+            <a href="{{BasePath "/tag/female/"}}">reine Frauenläufe</a> oder
+            <a href="{{BasePath "/tag/trail/"}}">Trail Running</a>?
+            Auf der <a href="{{BasePath "/tags.html"}}">Tag-Übersicht</a> kannst du Clubs nach Thema und Stil filtern.
+        </p>
+    </article>
+</section>
+
+{{template "footer.html" .}}

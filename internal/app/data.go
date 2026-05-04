@@ -147,6 +147,7 @@ func (c *Club) Search() string {
 
 type Post struct {
 	Title        string
+	Description  string
 	Slug         string
 	TemplateFile string
 }
@@ -569,12 +570,20 @@ func collectPosts(data *Data) error {
 			title = matches[1]
 		}
 
+		description := ""
+		reDesc := regexp.MustCompile(`<!--\s*DESCRIPTION\s+"([^"]+)"\s*-->`)
+		descMatches := reDesc.FindStringSubmatch(string(content))
+		if len(descMatches) > 1 {
+			description = descMatches[1]
+		}
+
 		filename := filepath.Base(file)
 		slug := "/post/" + strings.TrimSuffix(filename, filepath.Ext(filename)) + "/"
 		templateName := "posts/" + filename
 
 		data.Posts = append(data.Posts, &Post{
 			Title:        title,
+			Description:  description,
 			Slug:         slug,
 			TemplateFile: templateName,
 		})

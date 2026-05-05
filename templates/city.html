@@ -11,7 +11,7 @@
         {{if .City.Clubs}}
         <div class="note info-note">
             <p>
-                <strong>{{len .City.Clubs}} Social Run Club{{if ne (len .City.Clubs) 1}}s{{end}}</strong> wartet auf dich in <strong>{{.City.Name}}</strong>! Gemeinsam laufen macht mehr Spaß – finde deinen Lieblings-Club und schließ dich einer Community von Läufer:innen an.
+                <strong>{{len .City.Clubs}} Social Run Club{{if ne (len .City.Clubs) 1}}s{{end}}</strong> {{if ne (len .City.Clubs) 1}}warten{{else}}wartet{{end}} auf dich in <strong>{{.City.Name}}</strong>! Gemeinsam laufen macht mehr Spaß – finde deinen Lieblings-Club und schließ dich einer Community von Läufer:innen an.
             </p>
         </div>
 

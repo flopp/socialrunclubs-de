@@ -12,8 +12,10 @@
         {{range .Data.Clubs}}
         <a class="card-link" href="{{BasePath .Slug}}" data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.LatLon.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lon}}{{end}}">
             <article>
-                <img src="{{BasePath .Image}}" width=50 height="50">
-                <span>{{.Name}} (in {{.City.Name}})</span>
+                <div class="title">
+                    <img src="{{BasePath .Image}}" width=50 height="50">
+                    <span>{{.Name}} (in {{.City.Name}})</span>
+                </div>
             </article>
         </a>
         {{end}}

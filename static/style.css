@@ -145,14 +145,19 @@ header, footer {
     gap: var(--pico-spacing);
     margin-bottom: var(--pico-spacing);
 }
-.two-columns > .card-link > article{
+.two-columns > .card-link > article {
+    display: flex;
+    flex-direction: column;
+}
+
+.two-columns > .card-link > article > .title {
     margin-bottom: 0;
     display: flex;
     flex-direction: row;
     gap: var(--pico-spacing);
     align-items: center;
 }
-.two-columns > .card-link > article > img {
+.two-columns > .card-link > article > .title > img {
     border-radius: var(--pico-border-radius);
 }
 .two-columns > .card-link {
@@ -187,3 +192,26 @@ h1 {
     color: transparent;
     background-clip: text;
 }
+
+.note {
+    padding: var(--pico-typography-spacing-vertical);
+    border-radius: 0.5rem;
+    margin-bottom: var(--pico-typography-spacing-vertical);
+}
+.note > :first-child {
+    margin-top: 0;
+}
+.note > :last-child {
+    margin-bottom: 0;
+}
+
+.warning-note {
+    background: #fff3cd;
+    border-left: 4px solid #ff9800;
+}
+
+.info-note {
+    background: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+}
+

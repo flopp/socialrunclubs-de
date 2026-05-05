@@ -9,55 +9,79 @@
 
     <div>
         {{if .City.Clubs}}
-        <p>
-            Im {{.City.Name}} gibt es folgende Social Run Clubs, offene Lauftreffs und Laufgruppen:
-        </p>
+        <div class="note info-note">
+            <p>
+                <strong>{{len .City.Clubs}} Social Run Club{{if ne (len .City.Clubs) 1}}s{{end}}</strong> wartet auf dich in <strong>{{.City.Name}}</strong>! Gemeinsam laufen macht mehr Spaß – finde deinen Lieblings-Club und schließ dich einer Community von Läufer:innen an.
+            </p>
+        </div>
 
         <div class="two-columns">
             {{range .City.Clubs}}
             <a class="card-link" href="{{BasePath .Slug}}">
                 <article>
-                    <img src="{{BasePath .Image}}" width=50 height="50">
-                    <span>{{.Name}}</span>
+                    <div class="title">
+                        <img src="{{BasePath .Image}}" width=100 height="100">
+                        <span>{{.Name}} (in {{.City.Name}})</span>
+                    </div>
+                    <div style="flex-grow: 1;"> 
+                        {{if .Description}}<small>{{.Description}}</small>{{end}}
+                    </div>
+                    <footer>
+                        <button>
+                            Details ansehen
+                        </button>
+                    </footer>
                 </article>
             </a>
             {{end}}
-            <a class="card-link" href="{{.SubmitUrl}}" target="_blank">
-                <article class="add-club" role="button">
-                    <span class="plus-icon icon-white"> </span>
-                    <span>Social Run Club hinzufügen</span>
-                </article>
-            </a>
         </div>
         {{else}}
-        <p>
-            Wir haben noch keine Social Run Clubs für {{.City.Name}} in unserem Verzeichnis.
-            Hilf uns und füge einen bestehenden Club hinzu:
-        </p>
-        <p> 
-            <div role="group">
-                <a role="button" href="{{.SubmitUrl}}" target="_blank"><span class="plus-icon icon-white"> </span> Social Run Club hinzufügen</a>
-                <a role="button" class="secondary" href="https://www.google.com/search?q=run+clubs+{{.City.Name}}+site:instagram.com" target="_blank">Suche bei Google</a>
-            </div>
-        </p>
+        <div class="note warning-note">
+            <h3>
+                Noch keine Social Run Clubs eingetragen!
+            </h3>
+            <p>
+                <b>{{.City.Name}}</b> hat großes Potential!<br>
+                Hilf uns, die lokale Lauf-Community sichtbar zu machen und trag einen bestehenden Club oder eine Laufgruppe ein:
+            </p>
+        </div>
         {{end}}
+        <div role="group" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a role="button" href="{{.SubmitUrl}}" target="_blank">
+                <span class="plus-icon icon-white"> </span> Club jetzt hinzufügen
+            </a>
+            <a role="button" class="secondary" href="https://www.google.com/search?q=run+clubs+{{.City.Name}}+site:instagram.com" target="_blank">
+                Bei Google suchen
+            </a>
+        </div>
+    </div>
+
+    <div class="note info-note">
+        <h3>Warum ein Social Run Club?</h3>
+        <ul>
+            <li><strong>Community:</strong> Treffe andere Läufer:innen & Lauftreffs</li>
+            <li><strong>Motivation:</strong> Gemeinsam geht's leichter</li>
+            <li><strong>Spaß:</strong> Laufen ist mehr als nur Sport</li>
+            <li><strong>Anfängerfreundlich:</strong> Für alle Fitness-Level</li>
+        </ul>
     </div>
 
     {{if .City.LatLon}}
+    <h2>Wo liegt {{.City.Name}}?</h2>
     <div id="city-map" class="small-map" data-name="{{.City.Name}}" data-lat="{{.City.LatLon.Lat}}" data-lon="{{.City.LatLon.Lon}}"></div>
     {{end}}
 
     <h2>Nächste Städte mit Social Run Clubs:</h2>
-    <ul>
+    <ul style="columns: 2; gap: 2rem;">
         {{range .City.NearestCities}}
-        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> ({{len .Clubs}} Social Run Club{{if ne (len .Clubs) 1}}s{{end}})</li>
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> <small>({{len .Clubs}} Club{{if ne (len .Clubs) 1}}s{{end}})</small></li>
         {{end}}
     </ul>
 
-    <h2>Nächste Städte ohne Social Run Clubs:</h2>
-    <ul>
+    <h2>Weitere Städte erkunden:</h2>
+    <ul style="columns: 2; gap: 2rem;">
         {{range .City.NearestCitiesNoClub}}
-        <li><a href="{{BasePath .Slug}}">{{.Name}}</a></li>
+        <li><a href="{{BasePath .Slug}}">{{.Name}}</a> <small>(Noch keine Clubs)</small></li>
         {{end}}
     </ul>
 </section>

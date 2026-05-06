@@ -1,11 +1,9 @@
 module github.com/flopp/socialrunclubs-de
 
-go 1.25.0
-
-toolchain go1.26.2
+go 1.26.2
 
 require (
-	github.com/codingsince1985/geo-golang v1.8.5
+	github.com/codingsince1985/geo-golang v1.9.0
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258
 	github.com/flopp/go-googlesheetswrapper v0.0.0-20260406112809-7c5a6afecd10

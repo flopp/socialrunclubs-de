@@ -8,7 +8,7 @@ require (
 	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258
 	github.com/flopp/go-googlesheetswrapper v0.0.0-20260406112809-7c5a6afecd10
 	golang.org/x/text v0.37.0
-	google.golang.org/api v0.278.0
+	google.golang.org/api v0.279.0
 )
 
 require (

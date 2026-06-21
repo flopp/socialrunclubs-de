@@ -35,6 +35,7 @@
             </a>
             {{end}}
         </div>
+
         {{else}}
         <div class="note warning-note">
             <h3>
@@ -50,8 +51,11 @@
             <a role="button" href="{{.SubmitUrl}}" target="_blank">
                 <span class="plus-icon icon-white"> </span> Club jetzt hinzufügen
             </a>
-            <a role="button" class="secondary" href="https://www.google.com/search?q=run+clubs+{{.City.Name}}+site:instagram.com" target="_blank">
-                Bei Google suchen
+            <a role="button" class="secondary" href="https://www.google.com/search?q=run+club+{{.City.Name}}+site:instagram.com" target="_blank">
+                Bei Instagram suchen (via Google)
+            </a>
+            <a role="button" class="secondary" href="https://www.strava.com/clubs/search?%5Blat_lng%5D={{.City.LatLon.Lat}}%2C{{.City.LatLon.Lon}}&sport_type=running" target="_blank">
+                Bei Strava suchen
             </a>
         </div>
     </div>

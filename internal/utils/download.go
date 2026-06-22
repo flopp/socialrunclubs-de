@@ -56,6 +56,55 @@ func Download(url string, dst string) error {
 	return nil
 }
 
+func DownloadAgent(url string, dst string) error {
+	wrapErr := func(err error) error {
+		return fmt.Errorf("download %s to %s: %w", url, dst, err)
+	}
+
+	// Check directory exists before attempting to create file
+	err := os.MkdirAll(filepath.Dir(dst), 0770)
+	if err != nil {
+		return wrapErr(err)
+	}
+
+	// Create custom transport with insecure certificates
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return wrapErr(err)
+	}
+	defer resp.Body.Close()
+
+	// Check for HTTP errors before creating the file
+	if resp.StatusCode != http.StatusOK {
+		return wrapErr(fmt.Errorf("non-ok http status: %v", resp.Status))
+	}
+
+	// Create the output file after confirming the download is working
+	out, err := os.Create(dst)
+	if err != nil {
+		return wrapErr(err)
+	}
+	defer out.Close()
+
+	// Use a buffer for more efficient copying
+	buf := make([]byte, 32*1024) // 32KB buffer
+	_, err = io.CopyBuffer(out, resp.Body, buf)
+	if err != nil {
+		return wrapErr(err)
+	}
+
+	return nil
+}
+
 func DownloadHash(url string, dst string) (string, error) {
 	// Always download to a temporary file first
 	tmpfile, err := os.CreateTemp("", "")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,6 +12,33 @@ import (
 	"github.com/flopp/socialrunclubs-de/internal/app"
 	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
+
+func getStravaClubId(url string) (string, error) {
+	re := regexp.MustCompile(`^https?://www\.strava\.com/clubs/([^/]+)/?$`)
+	matches := re.FindStringSubmatch(url)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("invalid Strava club URL: %s", url)
+	}
+	return matches[1], nil
+}
+
+func extractStravaClubImageUrl(htmlFile string) (string, error) {
+	htmlBytes, err := os.ReadFile(htmlFile)
+	if err != nil {
+		return "", fmt.Errorf("error reading Strava club HTML file: %w", err)
+	}
+	htmlContent := string(htmlBytes)
+
+	reOgImage := regexp.MustCompile(`<meta property="og:image" content="([^"]+)"`)
+	matches := reOgImage.FindStringSubmatch(htmlContent)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("could not find og:image in Strava club HTML")
+	}
+
+	imageURL := matches[1]
+	imageURL = strings.ReplaceAll(imageURL, "&amp;", "&")
+	return imageURL, nil
+}
 
 func main() {
 	// read config file from command line (e.g., config.json)
@@ -76,6 +104,39 @@ func main() {
 			targetImage := config.ImageDir + "/" + profileName + ".jpg"
 			if err := utils.CopyFile(targetProfileImage, targetImage); err != nil {
 				log.Printf("Error copying Instagram profile image to target image: %v", err)
+			}
+
+			continue
+		}
+
+		stravaClubId, err := getStravaClubId(item.StravaClub)
+		if err == nil {
+			targetStravaHtml := config.CacheDir + "/strava/" + stravaClubId + "/html"
+			if !utils.FileExists(targetStravaHtml) {
+				err := utils.DownloadAgent(item.StravaClub, targetStravaHtml)
+				if err != nil {
+					log.Printf("Error downloading Strava club HTML: %v", err)
+				}
+			}
+
+			imageUrl, err := extractStravaClubImageUrl(targetStravaHtml)
+			if err != nil {
+				log.Printf("Error extracting Strava club image URL: %v", err)
+				continue
+			}
+
+			targetStravaImage := config.CacheDir + "/strava/" + stravaClubId + "/image.jpg"
+			if !utils.FileExists(targetStravaImage) {
+				err = utils.DownloadAgent(imageUrl, targetStravaImage)
+				if err != nil {
+					log.Printf("Error downloading Strava club image: %v", err)
+					continue
+				}
+			}
+
+			targetImage := filepath.Join(config.ImageDir, item.City.SanitizeName(), item.SanitizeName()+".jpg")
+			if err := utils.CopyFile(targetStravaImage, targetImage); err != nil {
+				log.Printf("Error copying Strava club image to target image: %v", err)
 			}
 
 			continue

@@ -17,7 +17,7 @@
         <a class="card-link" href="{{BasePath .Slug}}" data-search="{{.Search}}" data-url="{{BasePath .Slug}}" data-name="{{.Name}}" data-lat="{{if .LatLon}}{{.LatLon.Lat}}{{else}}{{.City.LatLon.Lat}}{{end}}" data-lon="{{if .LatLon}}{{.LatLon.Lon}}{{else}}{{.City.LatLon.Lon}}{{end}}">
             <article>
                 <div class="title">
-                    <img src="{{BasePath .Image}}" width=50 height="50">
+                    <img src="{{BasePath .Image}}" width=50 height="50" alt="{{.Name}} Logo">
                     <span>{{.Name}} (in {{.City.Name}})</span>
                 </div>
             </article>

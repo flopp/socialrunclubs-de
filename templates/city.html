@@ -20,7 +20,7 @@
             <a class="card-link" href="{{BasePath .Slug}}">
                 <article>
                     <div class="title">
-                        <img src="{{BasePath .Image}}" width=100 height="100">
+                        <img src="{{BasePath .Image}}" width=100 height="100" alt="{{.Name}} Logo">
                         <span>{{.Name}} (in {{.City.Name}})</span>
                     </div>
                     <div style="flex-grow: 1;"> 
@@ -43,7 +43,10 @@
             </h3>
             <p>
                 <b>{{.City.Name}}</b> hat großes Potential!<br>
-                Hilf uns, die lokale Lauf-Community sichtbar zu machen und trag einen bestehenden Club oder eine Laufgruppe ein:
+                Hilf uns, die lokale Lauf-Community sichtbar zu machen und trag einen bestehenden Club oder eine Laufgruppe ein.
+            </p>
+            <p>
+                Willst du selbst einen Social Run Club in {{.City.Name}} gründen? Super Idee! Hier haben wir einige Infos zusammengestellt: <a href="/post/wie-gruende-ich-einen-social-run-club/">Wie gründe ich einen Social Run Club?</a>
             </p>
         </div>
         {{end}}

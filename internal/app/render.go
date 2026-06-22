@@ -180,7 +180,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 
 func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
 	for _, city := range data.Cities {
-		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Social Run Clubs in %s", city.Name), city.MetaDescription(), createCanonicalURL(city.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, nil, nil, nil)
+		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Run Clubs und Lauftreffs in %s", city.Name), city.MetaDescription(), createCanonicalURL(city.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, nil, nil, nil)
 		fileName := filepath.Join(config.OutputDir, city.Slug(), "index.html")
 		if err := utils.ExecuteTemplate("city.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering city template %q: %w", city.Name, err)
@@ -188,7 +188,7 @@ func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umam
 		*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
 
 		for _, club := range city.Clubs {
-			tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("%s - ein Social Run Club in %s", club.Name, city.Name), club.MetaDescription(), createCanonicalURL(club.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, club, nil, nil)
+			tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("%s - ein Run Club in %s", club.Name, city.Name), club.MetaDescription(), createCanonicalURL(club.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, club, nil, nil)
 			fileName := filepath.Join(config.OutputDir, club.Slug(), "index.html")
 			if err := utils.ExecuteTemplate("club.html", fileName, tdata); err != nil {
 				return fmt.Errorf("rendering club template %q: %w", club.Name, err)
@@ -207,7 +207,7 @@ func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umam
 
 func renderTagPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
 	for _, tag := range data.Tags {
-		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Social Run Clubs in der Kategorie %s", tag.Name), fmt.Sprintf("Eine Übersicht über alle Social Run Clubs in der Kategorie %s.", tag.Name), createCanonicalURL(tag.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, nil, nil, tag, nil)
+		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Run Clubs und Lauftreffs in der Kategorie %s", tag.Name), fmt.Sprintf("Eine Übersicht über alle Run Clubs und Lauftreffs in der Kategorie %s.", tag.Name), createCanonicalURL(tag.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, nil, nil, tag, nil)
 		fileName := filepath.Join(config.OutputDir, tag.Slug(), "index.html")
 		if err := utils.ExecuteTemplate("tag.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering tag template %q: %w", tag.Name, err)

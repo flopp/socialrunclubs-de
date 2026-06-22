@@ -1,7 +1,7 @@
 {{template "header.html" .}}
 
 <section>
-    <h1>Social Run Clubs in {{.City.Name}}</h1>
+    <h1>Run Clubs und Lauftreffs in {{.City.Name}}</h1>
 
     <p class="btn-group">
         <a role="button" data-share data-url="{{.Canonical}}" data-title="{{.Title}}"><span class="share-icon icon-white"> </span> Seite Teilen</a>
@@ -11,7 +11,7 @@
         {{if .City.Clubs}}
         <div class="note info-note">
             <p>
-                <strong>{{len .City.Clubs}} Social Run Club{{if ne (len .City.Clubs) 1}}s{{end}}</strong> {{if ne (len .City.Clubs) 1}}warten{{else}}wartet{{end}} auf dich in <strong>{{.City.Name}}</strong>! Gemeinsam laufen macht mehr Spaß – finde deinen Lieblings-Club und schließ dich einer Community von Läufer:innen an.
+                <strong>{{len .City.Clubs}} Run Club{{if ne (len .City.Clubs) 1}}s{{end}}</strong> {{if ne (len .City.Clubs) 1}}warten{{else}}wartet{{end}} auf dich in <strong>{{.City.Name}}</strong>! Gemeinsam laufen macht mehr Spaß – finde deinen Lieblings-Club und schließ dich einer Community von Läufer:innen an.
             </p>
         </div>
 
@@ -39,14 +39,14 @@
         {{else}}
         <div class="note warning-note">
             <h3>
-                Noch keine Social Run Clubs eingetragen!
+                Noch keine Run Clubs und Lauftreffs eingetragen!
             </h3>
             <p>
                 <b>{{.City.Name}}</b> hat großes Potential!<br>
                 Hilf uns, die lokale Lauf-Community sichtbar zu machen und trag einen bestehenden Club oder eine Laufgruppe ein.
             </p>
             <p>
-                Willst du selbst einen Social Run Club in {{.City.Name}} gründen? Super Idee! Hier haben wir einige Infos zusammengestellt: <a href="/post/wie-gruende-ich-einen-social-run-club/">Wie gründe ich einen Social Run Club?</a>
+                Willst du selbst einen Run Club in {{.City.Name}} gründen? Super Idee! Hier haben wir einige Infos zusammengestellt: <a href="/post/wie-gruende-ich-einen-social-run-club/">Wie gründe ich einen Social Run Club?</a>
             </p>
         </div>
         {{end}}

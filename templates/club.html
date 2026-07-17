@@ -46,7 +46,7 @@
         <li><a href="https://maps.google.com/?q={{.Club.LatLon.Lat}},{{.Club.LatLon.Lon}}" target="_blank">Treffpunkt (Google Maps)</a></li>
         {{end}}
         {{if .Club.ParkrunsLink}}
-        <li><a href="{{.Club.ParkrunsLink}}" target="_blank">{{.Club.Name}} auf parkruns.de</a></li>
+        <li><a href="{{.Club.ParkrunsLink}}" target="_blank" title="{{.Club.Name}} / {{.Club.City.Name}}">{{.Club.Name}} auf parkruns.de</a></li>
         {{end}}
     </ul>
     </article>

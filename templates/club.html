@@ -19,7 +19,6 @@
         {{.Club.Description}}
     </p>
     {{if .Club.Tags}}<p>
-        Kategorien:
         <ul>
             {{range .Club.Tags}}<li><b>{{.Name}}</b>{{if .Description}}: {{.Description}}{{end}} (<a href="{{BasePath .Slug}}">zur Kategorie</a>)</li>{{end}}
         </ul>
@@ -45,6 +44,9 @@
         {{end}}
         {{if .Club.LatLon}}
         <li><a href="https://maps.google.com/?q={{.Club.LatLon.Lat}},{{.Club.LatLon.Lon}}" target="_blank">Treffpunkt (Google Maps)</a></li>
+        {{end}}
+        {{if .Club.ParkrunsLink}}
+        <li><a href="{{.Club.ParkrunsLink}}" target="_blank">{{.Club.Name}} auf parkruns.de</a></li>
         {{end}}
     </ul>
     </article>

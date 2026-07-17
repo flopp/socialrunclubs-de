@@ -103,6 +103,17 @@ type Club struct {
 	StatusRaw      string
 }
 
+var reParkrunUrl = regexp.MustCompile(`https?://www\.parkrun\.com\.de/([^/?]+)/*`)
+
+func (c *Club) ParkrunsLink() string {
+	matches := reParkrunUrl.FindStringSubmatch(c.Website)
+	if matches == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("https://parkruns.de/%s", matches[1])
+}
+
 func (c *Club) MetaDescription() string {
 	maxLength := 160
 	desc := fmt.Sprintf("Informationen und Links zum Social Run Club '%s' in %s", c.Name, c.City.Name)

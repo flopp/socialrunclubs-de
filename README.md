@@ -4,7 +4,7 @@ A directory of "Social Run Clubs" in Germany https://socialrunclubs.de
 # Features
 * displayed club data:
   * description
-  * links to Instagram, Strava, WhatsApp, club website
+  * links to Instagram, Strava, WhatsApp, TikTok, club website
   * map of meeting point (if known)
   * link to Google Maps
 * run clubs by city

@@ -67,6 +67,7 @@ func collectClubLinks(clubs []*Club) []clubLink {
 		links = appendClubLink(links, club, "instagram", club.Instagram)
 		links = appendClubLink(links, club, "strava", club.StravaClub)
 		links = appendClubLink(links, club, "whatsapp", club.Whatsapp)
+		links = appendClubLink(links, club, "tiktok", club.Tiktok)
 		links = appendClubLink(links, club, "signal", club.Signal)
 		links = appendClubLink(links, club, "website", club.Website)
 	}

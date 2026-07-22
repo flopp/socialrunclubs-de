@@ -3,7 +3,7 @@
 > A directory of Social Run Clubs in Germany.
 
 socialrunclubs.de is a website that lists Social Run Clubs across Germany.
-It provides an overview of running communities by city, with information about each club including descriptions, links to Instagram, Strava, WhatsApp, and club websites, as well as maps of meeting points.
+It provides an overview of running communities by city, with information about each club including descriptions, links to Instagram, Strava, WhatsApp, TikTok, and club websites, as well as maps of meeting points.
 
 ## Pages
 

@@ -27,8 +27,14 @@ func Download(url string, dst string) error {
 	}
 	client := &http.Client{Transport: tr}
 
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return wrapErr(err)
+	}
+	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+
 	// Make the request
-	resp, err := client.Get(url)
+	resp, err := client.Do(req)
 	if err != nil {
 		return wrapErr(err)
 	}

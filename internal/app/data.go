@@ -99,6 +99,7 @@ type Club struct {
 	Tiktok         string
 	Signal         string
 	Website        string
+	ImageURL       string
 	AddedRaw       string
 	UpdatedRaw     string
 	StatusRaw      string
@@ -309,7 +310,7 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 		return fmt.Errorf("sheet is empty")
 	}
 
-	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WHATSAPP_URL", "TIKTOK_URL", "WEBSITE_URL"}
+	required := []string{"ID", "ADDED", "UPDATED", "STATUS", "REDIRECT NAME", "REDIRECT CITY", "NAME", "OLD NAME", "CITY", "COORDS", "DESCRIPTION", "TAGS", "INSTAGRAM_URL", "STRAVA_URL", "WHATSAPP_URL", "TIKTOK_URL", "WEBSITE_URL", "IMAGE_URL"}
 	colIdx, err := googlesheetswrapper.ExtractHeader(rows[:1], required, false)
 	if err != nil {
 		return err
@@ -339,6 +340,7 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 			{&club.Whatsapp, "WHATSAPP_URL"},
 			{&club.Tiktok, "TIKTOK_URL"},
 			{&club.Website, "WEBSITE_URL"},
+			{&club.ImageURL, "IMAGE_URL"},
 			{&club.AddedRaw, "ADDED"},
 			{&club.UpdatedRaw, "UPDATED"},
 			{&club.StatusRaw, "STATUS"},

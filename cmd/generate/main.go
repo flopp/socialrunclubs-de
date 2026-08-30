@@ -1,45 +1,25 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"os"
+	"time"
 
 	"github.com/flopp/socialrunclubs-de/internal/app"
 	"github.com/flopp/socialrunclubs-de/internal/utils"
-	"google.golang.org/api/drive/v3"
-	"google.golang.org/api/option"
 )
 
 func backup(config app.Config, backupFile string) error {
-	fmt.Println("-- connecting to Google Drive service...")
-	ctx := context.Background()
-	service, err := drive.NewService(ctx, option.WithAPIKey(config.Google.APIKey))
-	if err != nil {
-		return fmt.Errorf("unable to connect to Google Drive: %w", err)
-	}
-
 	fmt.Printf("-- requesting file %s...\n", config.Google.SheetId)
-	response, err := service.Files.Export(config.Google.SheetId, "application/vnd.oasis.opendocument.spreadsheet").Download()
+	exportURL := fmt.Sprintf("https://docs.google.com/spreadsheets/d/%s/export?format=ods", config.Google.SheetId)
+	_, err := utils.Retry(5, 2*time.Second, func() (struct{}, error) {
+		return struct{}{}, utils.Download(exportURL, backupFile)
+	})
 	if err != nil {
-		return fmt.Errorf("unable to download file: %w", err)
+		return fmt.Errorf("unable to download file from %s: %w", exportURL, err)
 	}
-	defer response.Body.Close()
-
-	fmt.Printf("-- saving to %s...\n", backupFile)
-	file, err := os.Create(backupFile)
-	if err != nil {
-		return fmt.Errorf("unable to create output file: %w", err)
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, response.Body)
-	if err != nil {
-		return fmt.Errorf("unable to write to output file: %w", err)
-	}
+	fmt.Printf("-- saved to %s...\n", backupFile)
 
 	fmt.Println("-- done")
 	return nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -15,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chromedp/chromedp"
 	"github.com/flopp/socialrunclubs-de/internal/app"
 	"github.com/flopp/socialrunclubs-de/internal/utils"
 )
@@ -237,6 +239,54 @@ func getInsta2(targetImage string, cacheDir string, profileName string) error {
 	return nil
 }
 
+// fetchProfilePictureURL drives an interactive Chrome session against igexport.com
+// to resolve the direct image URL of the given Instagram profile's picture.
+func fetchInstagramProfilePictureURL(profileName string) (string, error) {
+	const profilePictureLookupURL = "https://igexport.com/en/profile-picture-download/"
+
+	allocCtx, cancelAlloc := chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
+	defer cancelAlloc()
+
+	ctx, cancel := chromedp.NewContext(allocCtx)
+	defer cancel()
+
+	ctx, cancelTimeout := context.WithTimeout(ctx, 60*time.Second)
+	defer cancelTimeout()
+
+	var imageURL string
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(profilePictureLookupURL),
+		chromedp.WaitVisible(`input[type="search"]`, chromedp.ByQuery),
+		chromedp.SendKeys(`input[type="search"]`, profileName, chromedp.ByQuery),
+		chromedp.Click(`//button[contains(., "View")]`, chromedp.BySearch),
+		chromedp.WaitVisible(`img.rounded-full`, chromedp.ByQuery),
+		chromedp.AttributeValue(`img.rounded-full`, "src", &imageURL, nil, chromedp.ByQuery),
+	)
+	if err != nil {
+		return "", err
+	}
+	if imageURL == "" {
+		return "", fmt.Errorf("could not find profile picture url for %q", profileName)
+	}
+
+	return imageURL, nil
+}
+
+func getInsta3(targetImage string, cacheDir string, profileName string) error {
+	imageURL, err := fetchInstagramProfilePictureURL(profileName)
+	if err != nil {
+		log.Printf("Error fetching Instagram profile picture URL for %s: %v", profileName, err)
+		return fmt.Errorf("error fetching Instagram profile picture URL for %s: %w", profileName, err)
+	}
+
+	err = utils.Download(imageURL, targetImage)
+	if err != nil {
+		log.Printf("Error downloading Instagram profile image: %v", err)
+		return fmt.Errorf("error downloading Instagram profile image: %w", err)
+	}
+	return nil
+}
+
 func getInstagramImage(config app.Config, item *app.Club, instagramImage string, targetFile string) error {
 	profileName := item.InstagramProfile()
 	if profileName == "" {
@@ -288,7 +338,9 @@ func getInstagramImage(config app.Config, item *app.Club, instagramImage string,
 
 		if err1 := getInsta1(instagramImage, config.CacheDir, profileName); err1 != nil {
 			if err2 := getInsta2(instagramImage, config.CacheDir, profileName); err2 != nil {
-				return fmt.Errorf("error downloading Instagram profile image for %s: %v, %v", profileName, err1, err2)
+				if err3 := getInsta3(instagramImage, config.CacheDir, profileName); err3 != nil {
+					return fmt.Errorf("all methods failed to fetch Instagram profile image for %s: %v, %v, %v", profileName, err1, err2, err3)
+				}
 			}
 		}
 	}

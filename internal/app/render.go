@@ -260,6 +260,13 @@ func createSiteFiles(data *Data, config Config, sitemapUrls []string) error {
 		return fmt.Errorf("writing htaccess file: %w", err)
 	}
 
+	// create robots.txt
+	robotsFile := filepath.Join(config.OutputDir, "robots.txt")
+	robotsData := []byte("User-agent: *\nAllow: /\n\nSitemap: https://socialrunclubs.de/sitemap.xml\n")
+	if err := os.WriteFile(robotsFile, robotsData, 0644); err != nil {
+		return fmt.Errorf("writing robots.txt: %w", err)
+	}
+
 	// create sitemap.xml
 	sitemapFile := filepath.Join(config.OutputDir, "sitemap.xml")
 	sitemapData := make([]byte, 0)

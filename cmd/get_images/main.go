@@ -64,6 +64,14 @@ func getStravaImagePath(config app.Config, item *app.Club) string {
 	return filepath.Join(config.CacheDir, "strava", stravaClubId, "image.jpg")
 }
 
+func getWhatsappImagePath(config app.Config, item *app.Club) string {
+	profileName := item.Whatsapp
+	if profileName == "" {
+		return ""
+	}
+	return filepath.Join(config.CacheDir, "whatsapp", item.City.SanitizeName(), item.SanitizeName(), "image.jpg")
+}
+
 func getInstagramImagePath(config app.Config, item *app.Club) string {
 	profileName := item.InstagramProfile()
 	if profileName == "" {
@@ -352,6 +360,56 @@ func getInstagramImage(config app.Config, item *app.Club, instagramImage string,
 	return nil
 }
 
+func extractWhatsappImageUrl(targetHtml string) (string, error) {
+	htmlBytes, err := os.ReadFile(targetHtml)
+	if err != nil {
+		return "", fmt.Errorf("error reading WhatsApp HTML file: %w", err)
+	}
+	htmlContent := string(htmlBytes)
+
+	reOgImage := regexp.MustCompile(`<meta property="og:image" content="([^"]+)"`)
+	matches := reOgImage.FindStringSubmatch(htmlContent)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("could not find og:image in WhatsApp HTML")
+	}
+
+	imageURL := matches[1]
+	imageURL = strings.ReplaceAll(imageURL, "&amp;", "&")
+	return imageURL, nil
+}
+
+func getWhatsappImage(config app.Config, item *app.Club, whatsappImage, targetImage string) error {
+	if whatsappImage == "" {
+		return fmt.Errorf("no WhatsApp image available")
+	}
+
+	if !utils.FileExists(whatsappImage) {
+		targetHtml := config.CacheDir + "/whatsapp/" + item.City.SanitizeName() + "/" + item.SanitizeName() + "/html"
+		if !utils.FileExists(targetHtml) {
+			err := utils.DownloadAgent(item.Whatsapp, targetHtml)
+			if err != nil {
+				return fmt.Errorf("error downloading WhatsApp HTML: %w", err)
+			}
+		}
+
+		imageUrl, err := extractWhatsappImageUrl(targetHtml)
+		if err != nil {
+			return fmt.Errorf("error extracting WhatsApp image URL: %w", err)
+		}
+
+		err = utils.DownloadAgent(imageUrl, whatsappImage)
+		if err != nil {
+			return fmt.Errorf("error downloading WhatsApp image: %w", err)
+		}
+	}
+
+	if err := utils.CopyFile(whatsappImage, targetImage); err != nil {
+		return fmt.Errorf("error copying WhatsApp image to target file: %w", err)
+	}
+
+	return nil
+}
+
 func main() {
 	// read config file from command line (e.g., config.json)
 	configFile := flag.String("config", "config.json", "Path to the config file")
@@ -378,6 +436,7 @@ func main() {
 		urlImage := getUrlImagePath(config, item)
 		stravaImage := getStravaImagePath(config, item)
 		instagramImage := getInstagramImagePath(config, item)
+		whatsappImage := getWhatsappImagePath(config, item)
 
 		methods := []struct {
 			name      string
@@ -403,6 +462,13 @@ func main() {
 				imagePath: stravaImage,
 				fn: func() error {
 					return getStravaImage(config, item, stravaImage, targetImage)
+				},
+			},
+			{
+				name:      "whatsapp",
+				imagePath: whatsappImage,
+				fn: func() error {
+					return getWhatsappImage(config, item, whatsappImage, targetImage)
 				},
 			},
 			{
@@ -434,6 +500,7 @@ func main() {
 		// try vto get new image
 		for _, method := range methods {
 			if method.imagePath != "" {
+
 				if err := method.fn(); err != nil {
 					log.Printf("Error downloading image using method %s for club %s in city %s: %v", method.name, item.Name, item.City.Name, err)
 					continue
@@ -446,7 +513,7 @@ func main() {
 		}
 
 		if !utils.FileExists(targetImage) {
-			log.Printf("No image found for club %s in city %s -> %s", item.Name, item.City.Name, directImage)
+			log.Printf("No image found for club %s in city %s -> %s\n", item.Name, item.City.Name, directImage)
 		}
 	}
 }

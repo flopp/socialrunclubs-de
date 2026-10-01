@@ -3,11 +3,12 @@ module github.com/flopp/socialrunclubs-de
 go 1.26.2
 
 require (
+	github.com/chromedp/chromedp v0.16.0
 	github.com/codingsince1985/geo-golang v1.9.0
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/flopp/go-filehash v0.0.0-20250313113005-e3e8650a2258
 	github.com/flopp/go-googlesheetswrapper v0.0.0-20260406112809-7c5a6afecd10
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.42.0
 	google.golang.org/api v0.289.0
 )
 
@@ -17,7 +18,6 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chromedp/cdproto v0.0.0-20260714215040-dc233986426f // indirect
-	github.com/chromedp/chromedp v0.16.0 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-json-experiment/json v0.0.0-20260623181947-01eb4420fa68 // indirect

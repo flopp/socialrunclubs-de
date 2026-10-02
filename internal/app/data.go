@@ -361,8 +361,38 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 			log.Printf("CLUBS row %d: empty club name: %q", index+2, club.Name)
 			continue
 		}
+		if len(club.Name) > 100 {
+			log.Printf("CLUBS row %d: club name too long: %q", index+2, club.Name)
+			continue
+		}
 		if cityRaw == "" {
 			log.Printf("CLUBS row %d: empty city name: %q", index+2, cityRaw)
+			continue
+		}
+		if len(cityRaw) > 100 {
+			log.Printf("CLUBS row %d: city name too long: %q", index+2, cityRaw)
+			continue
+		}
+
+		// check links (malformed)
+		if club.Website != "" && !utils.IsValidURL(club.Website) {
+			log.Printf("CLUBS row %d: malformed website URL: %q", index+2, club.Website)
+			continue
+		}
+		if club.Instagram != "" && !utils.IsValidURL(club.Instagram) {
+			log.Printf("CLUBS row %d: malformed instagram URL: %q", index+2, club.Instagram)
+			continue
+		}
+		if club.StravaClub != "" && !utils.IsValidURL(club.StravaClub) {
+			log.Printf("CLUBS row %d: malformed strava URL: %q", index+2, club.StravaClub)
+			continue
+		}
+		if club.Whatsapp != "" && !utils.IsValidURL(club.Whatsapp) {
+			log.Printf("CLUBS row %d: malformed whatsapp URL: %q", index+2, club.Whatsapp)
+			continue
+		}
+		if club.Tiktok != "" && !utils.IsValidURL(club.Tiktok) {
+			log.Printf("CLUBS row %d: malformed tiktok URL: %q", index+2, club.Tiktok)
 			continue
 		}
 

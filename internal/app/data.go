@@ -316,6 +316,9 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 		return err
 	}
 
+	emptyIdName := ""
+	emptyIdRow := -1
+
 	hasCities := len(data.Cities) > 0
 	for index, row := range rows[1:] {
 		club := &Club{}
@@ -329,8 +332,10 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 		cityRaw := ""
 		latLonRaw := ""
 		tagsRaw := ""
+		id := ""
 
 		mappings := []fieldMapping{
+			{&id, "ID"},
 			{&club.Name, "NAME"},
 			{&club.DescriptionRaw, "DESCRIPTION"},
 			{&cityRaw, "CITY"},
@@ -352,8 +357,21 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 			if val, err := getVal(mapping.col, row, colIdx); err != nil {
 				return fmt.Errorf("row %d: %v", index+2, err)
 			} else {
-				*mapping.field = val
+				*mapping.field = strings.TrimSpace(val)
 			}
+		}
+
+		if id == "" {
+			emptyIdName = club.Name
+			emptyIdRow = index + 2
+			continue
+		} else {
+			// only print a message non-trailing empty IDs
+			if emptyIdRow != -1 {
+				log.Printf("CLUBS row %d: previously empty ID for club: %q", emptyIdRow, emptyIdName)
+			}
+			emptyIdName = ""
+			emptyIdRow = -1
 		}
 
 		// skip invalid clubs

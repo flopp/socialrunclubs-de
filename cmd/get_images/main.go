@@ -390,9 +390,13 @@ func getInstagramImage(config app.Config, item *app.Club, instagramImage string,
 		*/
 
 		if err4 := getInsta4(instagramImage, config.CacheDir, profileName); err4 != nil {
+			log.Printf("Error fetching Instagram profile image using method 4 for %s: %v", profileName, err4)
 			if err1 := getInsta1(instagramImage, config.CacheDir, profileName); err1 != nil {
+				log.Printf("Error fetching Instagram profile image using method 1 for %s: %v", profileName, err1)
 				if err2 := getInsta2(instagramImage, config.CacheDir, profileName); err2 != nil {
+					log.Printf("Error fetching Instagram profile image using method 2 for %s: %v", profileName, err2)
 					if err3 := getInsta3(instagramImage, config.CacheDir, profileName); err3 != nil {
+						log.Printf("Error fetching Instagram profile image using method 3 for %s: %v", profileName, err3)
 						return fmt.Errorf("all methods failed to fetch Instagram profile image for %s: %v, %v, %v, %v", profileName, err1, err2, err3, err4)
 					}
 				}

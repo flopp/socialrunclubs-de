@@ -261,18 +261,21 @@ func fetchInstagramProfilePictureURL(profileName string) (string, error) {
 	ctx, cancelTimeout := context.WithTimeout(ctx, 60*time.Second)
 	defer cancelTimeout()
 
-	var imageURL string
-	err := chromedp.Run(ctx,
+	err := chromedp.Do(ctx,
 		chromedp.Navigate(profilePictureLookupURL),
-		chromedp.WaitVisible(`input[type="search"]`, chromedp.ByQuery),
-		chromedp.SendKeys(`input[type="search"]`, profileName, chromedp.ByQuery),
-		chromedp.Click(`//button[contains(., "View")]`, chromedp.BySearch),
-		chromedp.WaitVisible(`img.rounded-full`, chromedp.ByQuery),
-		chromedp.AttributeValue(`img.rounded-full`, "src", &imageURL, nil, chromedp.ByQuery),
+		chromedp.WaitVisible(chromedp.CSS(`input[type="search"]`)),
+		chromedp.SendKeys(chromedp.CSS(`input[type="search"]`), profileName),
+		chromedp.Click(chromedp.Search(`//button[contains(., "View")]`)),
+		chromedp.WaitVisible(chromedp.CSS(`img.rounded-full`)),
 	)
 	if err != nil {
 		return "", err
 	}
+	imageResult, err := chromedp.Run(ctx, chromedp.AttributeValue(chromedp.CSS(`img.rounded-full`), "src"))
+	if err != nil {
+		return "", err
+	}
+	imageURL := imageResult.Value
 	if imageURL == "" {
 		return "", fmt.Errorf("could not find profile picture url for %q", profileName)
 	}
@@ -309,15 +312,18 @@ func fetchInstagramProfilePictureURLDirect(profileName string) (string, error) {
 	ctx, cancelTimeout := context.WithTimeout(ctx, 60*time.Second)
 	defer cancelTimeout()
 
-	var imageURL string
-	err := chromedp.Run(ctx,
+	err := chromedp.Do(ctx,
 		chromedp.Navigate(profileURL),
-		chromedp.WaitReady(`meta[property="og:image"]`, chromedp.ByQuery),
-		chromedp.AttributeValue(`meta[property="og:image"]`, "content", &imageURL, nil, chromedp.ByQuery),
+		chromedp.WaitReady(chromedp.CSS(`meta[property="og:image"]`)),
 	)
 	if err != nil {
 		return "", err
 	}
+	imageResult, err := chromedp.Run(ctx, chromedp.AttributeValue(chromedp.CSS(`meta[property="og:image"]`), "content"))
+	if err != nil {
+		return "", err
+	}
+	imageURL := imageResult.Value
 	if imageURL == "" {
 		return "", fmt.Errorf("could not find profile picture url for %q", profileName)
 	}

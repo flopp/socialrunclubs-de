@@ -102,6 +102,12 @@ header, footer {
     width: 100%;
 }
 
+.location-map {
+    height: 420px;
+    width: 100%;
+    margin-bottom: var(--pico-spacing);
+}
+
 .big-map {
     height: 600px;
     width: 100%;
@@ -214,4 +220,3 @@ h1 {
     background: #d1ecf1;
     border-left: 4px solid #17a2b8;
 }
-

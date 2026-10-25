@@ -106,6 +106,133 @@ document.addEventListener('DOMContentLoaded', function() {
         return L.marker([lat, lon]).bindPopup(popupContent);
     };
 
+    // Club submission location picker
+    const locationMapDiv = document.getElementById('club-location-map');
+    if (locationMapDiv) {
+        const locationMap = initializeMap('club-location-map').setView([51.1657, 10.4515], 6);
+        const coordsInput = document.getElementById('club-coords');
+        const addressInput = document.getElementById('club-address-search');
+        const searchButton = document.getElementById('club-address-search-button');
+        const mapStatus = document.getElementById('club-map-status');
+        const addressResults = document.getElementById('club-address-results');
+        const submitForm = document.getElementById('club-submit-form');
+        const formattedRow = document.getElementById('formatted-row');
+        const copyStatus = document.getElementById('copy-status');
+        let locationMarker;
+        let lastSearchAt = 0;
+
+        document.getElementById('clear-club-form').addEventListener('click', () => {
+            submitForm.reset();
+            formattedRow.value = '';
+            copyStatus.textContent = '';
+            addressResults.replaceChildren();
+            mapStatus.textContent = 'Klicke auf die Karte, um den Treffpunkt auszuwählen.';
+            if (locationMarker) {
+                locationMarker.remove();
+                locationMarker = undefined;
+            }
+        });
+
+        const selectLocation = (lat, lon) => {
+            const location = [lat, lon];
+            if (locationMarker) {
+                locationMarker.setLatLng(location);
+            } else {
+                locationMarker = L.marker(location).addTo(locationMap);
+            }
+            locationMap.panTo(location);
+            coordsInput.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            coordsInput.dispatchEvent(new Event('input', { bubbles: true }));
+            mapStatus.textContent = 'Treffpunkt ausgewählt.';
+        };
+
+        locationMap.on('click', (event) => {
+            selectLocation(event.latlng.lat, event.latlng.lng);
+        });
+
+        const searchAddress = async () => {
+            const address = addressInput.value.trim();
+            if (!address) {
+                mapStatus.textContent = 'Bitte gib eine Adresse oder einen Ort ein.';
+                return;
+            }
+
+            const timeSinceLastSearch = Date.now() - lastSearchAt;
+            if (timeSinceLastSearch < 1000) {
+                mapStatus.textContent = 'Bitte warte kurz, bevor du erneut suchst.';
+                return;
+            }
+            lastSearchAt = Date.now();
+            searchButton.disabled = true;
+            mapStatus.textContent = 'Suche läuft …';
+            addressResults.replaceChildren();
+
+            const city = document.getElementById('club-city').value.trim();
+            const query = city ? `${address}, ${city}` : address;
+            const searchUrl = new URL('https://nominatim.openstreetmap.org/search');
+            searchUrl.search = new URLSearchParams({
+                format: 'jsonv2',
+                limit: '5',
+                q: query
+            }).toString();
+
+            try {
+                const response = await fetch(searchUrl, {
+                    headers: { 'Accept-Language': 'de' }
+                });
+                if (!response.ok) {
+                    throw new Error(`Nominatim antwortete mit HTTP ${response.status}.`);
+                }
+
+                const results = await response.json();
+                if (!Array.isArray(results)) {
+                    throw new Error('Die Antwort der Adresssuche war ungültig.');
+                }
+                if (results.length === 0) {
+                    mapStatus.textContent = 'Keine passende Adresse gefunden.';
+                    return;
+                }
+
+                mapStatus.textContent = 'Wähle den passenden Suchtreffer aus:';
+                results.forEach((result) => {
+                    const lat = Number(result.lat);
+                    const lon = Number(result.lon);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+                        return;
+                    }
+
+                    const item = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'secondary';
+                    button.textContent = result.display_name;
+                    button.addEventListener('click', () => selectLocation(lat, lon));
+                    item.appendChild(button);
+                    addressResults.appendChild(item);
+                });
+                if (addressResults.childElementCount === 0) {
+                    throw new Error('Die Suchtreffer enthielten keine gültigen Koordinaten.');
+                }
+            } catch (error) {
+                console.error('Adresssuche fehlgeschlagen:', error);
+                mapStatus.textContent = 'Die Adresssuche ist fehlgeschlagen. Bitte versuche es später erneut oder wähle den Punkt direkt auf der Karte.';
+            } finally {
+                window.setTimeout(() => {
+                    searchButton.disabled = false;
+                }, 1000);
+            }
+        };
+
+        searchButton.addEventListener('click', searchAddress);
+        addressInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchAddress();
+            }
+        });
+        fixLeafletButtons(locationMapDiv);
+    }
+
     // Club Map
     const clubMapDiv = document.getElementById('club-map');
     if (clubMapDiv) {

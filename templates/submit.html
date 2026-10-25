@@ -2,7 +2,7 @@
 
 <section>
     <h1>Run Club eintragen</h1>
-    <p>Fülle die Angaben aus und füge die kopierte Zeile ab der Spalte ID in die Google-Tabelle ein. Nicht bekannte Spalten bleiben leer; ADDED erhält das heutige Datum.</p>
+    <p>Fülle die Angaben aus und füge die kopierte Zeile ab der Spalte ID in die Google-Tabelle ein. Nicht bekannte Spalten bleiben leer; ADDED erhält das heutige Datum. Wähle den Treffpunkt auf der Karte oder suche nach einer Adresse.</p>
 
     <form id="club-submit-form">
         <label for="club-name">Name
@@ -12,6 +12,18 @@
         <label for="club-city">Stadt
             <input id="club-city" name="city" type="text" autocomplete="off">
         </label>
+
+        <label for="club-address-search">Adresse suchen
+            <input id="club-address-search" type="search" autocomplete="off">
+        </label>
+        <button id="club-address-search-button" type="button">Adresse suchen</button>
+        <small id="club-map-status" role="status" aria-live="polite">Klicke auf die Karte, um den Treffpunkt auszuwählen.</small>
+        <ul id="club-address-results"></ul>
+        <div id="club-location-map" class="location-map" aria-label="Karte zur Auswahl des Treffpunkts"></div>
+        <label for="club-coords">Koordinaten (Breite, Länge)
+            <input id="club-coords" name="coords" type="text" readonly>
+        </label>
+        <small>Kartendaten &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>. Adresssuche: <a href="https://nominatim.org/" target="_blank" rel="noopener noreferrer">Nominatim</a>.</small>
 
         <label for="club-description">Beschreibung
             <textarea id="club-description" name="description" rows="5"></textarea>
@@ -33,7 +45,10 @@
             <input id="club-whatsapp" name="whatsapp" type="url" autocomplete="url">
         </label>
 
-        <button type="submit">Zeile kopieren</button>
+        <div class="grid">
+            <button type="submit">Zeile kopieren</button>
+            <button id="clear-club-form" type="button" class="secondary">Formular leeren</button>
+        </div>
     </form>
 
     <label for="formatted-row">Formatierte Zeile (ID bis IMAGE_URL)
@@ -84,7 +99,7 @@
             cleanCell(form.elements.name.value),
             '',
             cleanCell(form.elements.city.value),
-            '',
+            cleanCell(form.elements.coords.value),
             description,
             cleanTags(form.elements.tags.value),
             cleanUrl(form.elements.instagram.value),

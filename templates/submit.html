@@ -1,0 +1,127 @@
+{{template "header.html" .}}
+
+<section>
+    <h1>Run Club eintragen</h1>
+    <p>Fülle die Angaben aus und füge die kopierte Zeile ab der Spalte ID in die Google-Tabelle ein. Nicht bekannte Spalten bleiben leer; ADDED erhält das heutige Datum.</p>
+
+    <form id="club-submit-form">
+        <label for="club-name">Name
+            <input id="club-name" name="name" type="text" autocomplete="off">
+        </label>
+
+        <label for="club-city">Stadt
+            <input id="club-city" name="city" type="text" autocomplete="off">
+        </label>
+
+        <label for="club-description">Beschreibung
+            <textarea id="club-description" name="description" rows="5"></textarea>
+        </label>
+
+        <label for="club-tags">Tags (kommagetrennt)
+            <input id="club-tags" name="tags" type="text" autocomplete="off">
+        </label>
+
+        <label for="club-instagram">Instagram
+            <input id="club-instagram" name="instagram" type="url" autocomplete="url">
+        </label>
+
+        <label for="club-strava">Strava
+            <input id="club-strava" name="strava" type="url" autocomplete="url">
+        </label>
+
+        <label for="club-whatsapp">WhatsApp
+            <input id="club-whatsapp" name="whatsapp" type="url" autocomplete="url">
+        </label>
+
+        <button type="submit">Zeile kopieren</button>
+    </form>
+
+    <label for="formatted-row">Formatierte Zeile (ID bis IMAGE_URL)
+        <textarea id="formatted-row" rows="3" readonly></textarea>
+    </label>
+    <small id="copy-status" role="status" aria-live="polite"></small>
+</section>
+
+<script>
+    const form = document.getElementById('club-submit-form');
+    const output = document.getElementById('formatted-row');
+    const status = document.getElementById('copy-status');
+
+    function cleanCell(value) {
+        return value.trim().replace(/\t/g, ' ');
+    }
+
+    function cleanUrl(value) {
+        return cleanCell(value).split('?')[0].trim();
+    }
+
+    function cleanTags(value) {
+        return value
+            .split(',')
+            .map(tag => cleanCell(tag))
+            .filter(Boolean)
+            .join(', ');
+    }
+
+    function currentDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatRow() {
+        const description = cleanCell(form.elements.description.value)
+            .replace(/\r\n?|\n/g, '<br>');
+        return [
+            '',
+            currentDate(),
+            '',
+            '',
+            '',
+            '',
+            cleanCell(form.elements.name.value),
+            '',
+            cleanCell(form.elements.city.value),
+            '',
+            description,
+            cleanTags(form.elements.tags.value),
+            cleanUrl(form.elements.instagram.value),
+            cleanUrl(form.elements.strava.value),
+            cleanUrl(form.elements.whatsapp.value),
+            '',
+            '',
+            ''
+        ].join('\t');
+    }
+
+    form.addEventListener('input', () => {
+        output.value = formatRow();
+        status.textContent = '';
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        output.value = formatRow();
+
+        if (!navigator.clipboard) {
+            status.textContent = 'Der Zugriff auf die Zwischenablage ist nicht verfügbar. Kopiere die formatierte Zeile manuell.';
+            output.focus();
+            output.select();
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(output.value);
+            status.textContent = 'Zeile kopiert. Du kannst sie jetzt in die Google-Tabelle einfügen.';
+        } catch (error) {
+            console.error('Kopieren in die Zwischenablage fehlgeschlagen:', error);
+            status.textContent = 'Kopieren fehlgeschlagen. Kopiere die formatierte Zeile bitte manuell.';
+            output.focus();
+            output.select();
+        }
+    });
+</script>
+
+{{template "footer.html" .}}

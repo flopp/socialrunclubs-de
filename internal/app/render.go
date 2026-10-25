@@ -18,6 +18,7 @@ type TemplateData struct {
 	Title          string
 	Description    string
 	Canonical      string
+	NoIndex        bool
 	SubmitUrl      string // URL to submit a new club
 	ReportUrl      string // URL to report an issue with a club
 	CssFiles       []string
@@ -240,6 +241,13 @@ func renderSpecialPages(data *Data, config Config, cssFiles, otherJS []string, u
 	tdata = createTemplateData(config, data, "Club Image Grid", "Club Image Grid", createCanonicalURL("/grid.html"), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS)
 	if err := utils.ExecuteTemplate("grid.html", filepath.Join(config.OutputDir, "grid.html"), tdata); err != nil {
 		return fmt.Errorf("rendering template %s: %w", "grid.html", err)
+	}
+
+	// private helper page for formatting new club submissions
+	tdata = createTemplateData(config, data, "Run Club eintragen - Social Run Clubs", "Interne Hilfe zum Formatieren neuer Run Club Einträge.", createCanonicalURL("/submit.html"), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS)
+	tdata.NoIndex = true
+	if err := utils.ExecuteTemplate("submit.html", filepath.Join(config.OutputDir, "submit.html"), tdata); err != nil {
+		return fmt.Errorf("rendering template %s: %w", "submit.html", err)
 	}
 
 	return nil

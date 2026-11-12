@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Club submission location picker
     const locationMapDiv = document.getElementById('club-location-map');
     if (locationMapDiv) {
-        const locationMap = initializeMap('club-location-map').setView([51.1657, 10.4515], 6);
+        const locationMap = initializeMap('club-location-map').setView([51.1657, 10.4515], 13);
         const coordsInput = document.getElementById('club-coords');
         const addressInput = document.getElementById('club-address-search');
         const searchButton = document.getElementById('club-address-search-button');

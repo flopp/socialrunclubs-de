@@ -82,7 +82,8 @@ func getInstagramImagePath(config app.Config, item *app.Club) string {
 
 func getDirectImage(config app.Config, item *app.Club, directImage string, targetFile string) error {
 	if !utils.FileExists(directImage) {
-		return fmt.Errorf("direct image file does not exist: %s", directImage)
+		//return fmt.Errorf("direct image file does not exist: %s", directImage)
+		return nil
 	}
 
 	if err := utils.CopyFile(directImage, targetFile); err != nil {
@@ -495,6 +496,10 @@ func main() {
 		instagramImage := getInstagramImagePath(config, item)
 		whatsappImage := getWhatsappImagePath(config, item)
 
+		if utils.FileExists(targetImage) {
+			continue
+		}
+
 		methods := []struct {
 			name      string
 			imagePath string
@@ -554,10 +559,9 @@ func main() {
 			continue
 		}
 
-		// try vto get new image
+		// try to get new image
 		for _, method := range methods {
 			if method.imagePath != "" {
-
 				if err := method.fn(); err != nil {
 					log.Printf("Error downloading image using method %s for club %s in city %s: %v", method.name, item.Name, item.City.Name, err)
 					continue

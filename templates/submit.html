@@ -13,6 +13,22 @@
             <input id="club-city" name="city" type="text" autocomplete="off">
         </label>
 
+        <label for="club-instagram">Instagram
+            <input id="club-instagram" name="instagram" type="url" autocomplete="url">
+        </label>
+
+        <label for="club-strava">Strava
+            <input id="club-strava" name="strava" type="url" autocomplete="url">
+        </label>
+
+        <label for="club-whatsapp">WhatsApp
+            <input id="club-whatsapp" name="whatsapp" type="url" autocomplete="url">
+        </label>
+
+        <label for="club-website">Website
+            <input id="club-website" name="website" type="url" autocomplete="url">
+        </label>
+
         <label for="club-address-search">Adresse suchen
             <input id="club-address-search" type="search" autocomplete="off">
         </label>
@@ -31,18 +47,6 @@
 
         <label for="club-tags">Tags (kommagetrennt)
             <input id="club-tags" name="tags" type="text" autocomplete="off">
-        </label>
-
-        <label for="club-instagram">Instagram
-            <input id="club-instagram" name="instagram" type="url" autocomplete="url">
-        </label>
-
-        <label for="club-strava">Strava
-            <input id="club-strava" name="strava" type="url" autocomplete="url">
-        </label>
-
-        <label for="club-whatsapp">WhatsApp
-            <input id="club-whatsapp" name="whatsapp" type="url" autocomplete="url">
         </label>
 
         <div class="grid">
@@ -105,7 +109,7 @@
             cleanUrl(form.elements.instagram.value),
             cleanUrl(form.elements.strava.value),
             cleanUrl(form.elements.whatsapp.value),
-            '',
+            cleanCell(form.elements.website.value),
             '',
             ''
         ].join('\t');

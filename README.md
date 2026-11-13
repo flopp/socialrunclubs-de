@@ -13,7 +13,7 @@ A directory of "Social Run Clubs" in Germany https://socialrunclubs.de
 
 # Design:
 * mobile first & clean
-* based on Pico CSS (https://picocss.com/)
+* based on Blades CSS (https://blades.dev/)
 
 # Implementation
 * data is stored in Google Sheets

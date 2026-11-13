@@ -49,7 +49,7 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	jsFiles := make([]string, 0)
 
 	jsDelivr := "https://cdn.jsdelivr.net/npm"
-	picoCssUrl := jsDelivr + "/@picocss/pico@2"
+	bladesCssUrl := jsDelivr + "/@anyblades/blades@3"
 	leafletUrl := jsDelivr + "/leaflet@1.9.4/dist"
 	markerClusterUrl := jsDelivr + "/leaflet.markercluster@1.5.3/dist"
 	gestureHandlingUrl := jsDelivr + "/@gstat/leaflet-gesture-handling@1.2.8/dist"
@@ -60,7 +60,7 @@ func CopyAssets(config Config) ([]string, []string, error) {
 	}
 
 	assets := []Asset{
-		{picoCssUrl + "/css/pico.min.css", "static/pico.HASH.css"},
+		{bladesCssUrl + "/css/blades.min.css", "static/blades.HASH.css"},
 		{leafletUrl + "/leaflet.min.css", "static/leaflet.HASH.css"},
 		{leafletUrl + "/leaflet.min.js", "static/leaflet.HASH.js"},
 		{leafletUrl + "/images/marker-icon.png", "static/images/marker-icon.png"},

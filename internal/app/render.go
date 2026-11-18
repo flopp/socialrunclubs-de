@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/xml"
 	"fmt"
 	"net/url"
 	"os"
@@ -109,6 +110,8 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 		Canonical   string
 		Template    string
 		OutFile     string
+		LastMod     string
+		NoIndex     bool
 	}{
 		{
 			Title:       "Social Run Clubs in Deutschland",
@@ -116,6 +119,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/",
 			Template:    "index.html",
 			OutFile:     "index.html",
+			LastMod:     data.LastMod(),
 		},
 		{
 			Title:       "Impressum - Social Run Clubs",
@@ -123,6 +127,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/impressum.html",
 			Template:    "impressum.html",
 			OutFile:     "impressum.html",
+			NoIndex:     true,
 		},
 		{
 			Title:       "Datenschutz - Social Run Clubs",
@@ -130,6 +135,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "datenschutz.html",
 			Template:    "datenschutz.html",
 			OutFile:     "datenschutz.html",
+			NoIndex:     true,
 		},
 		{
 			Title:       "Deutsche Städte mit Social Run Clubs",
@@ -137,6 +143,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/cities.html",
 			Template:    "cities.html",
 			OutFile:     "cities.html",
+			LastMod:     data.LastMod(),
 		},
 		{
 			Title:       "Deutsche Städte ohne Social Run Clubs",
@@ -144,6 +151,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/cities-no-club.html",
 			Template:    "cities-no-club.html",
 			OutFile:     "cities-no-club.html",
+			NoIndex:     true,
 		},
 		{
 			Title:       "Liste aller Social Run Clubs in Deutschland",
@@ -151,6 +159,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/clubs.html",
 			Template:    "clubs.html",
 			OutFile:     "clubs.html",
+			LastMod:     data.LastMod(),
 		},
 		{
 			Title:       "Social Run Club Kategorien",
@@ -158,6 +167,7 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 			Canonical:   "/tags.html",
 			Template:    "tags.html",
 			OutFile:     "tags.html",
+			LastMod:     data.LastMod(),
 		},
 		{
 			Title:       "Social Run Club Artikel",
@@ -170,10 +180,14 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 
 	for _, page := range pages {
 		tdata := createTemplateData(config, data, page.Title, page.Description, createCanonicalURL(page.Canonical), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS)
+		tdata.NoIndex = page.NoIndex
 		if err := utils.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
 			return fmt.Errorf("rendering template %s: %w", page.Template, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical})
+		if page.NoIndex {
+			continue
+		}
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical, LastMod: page.LastMod})
 	}
 
 	return nil
@@ -196,11 +210,16 @@ func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umam
 			}
 
 			imgName := filepath.Join(config.OutputDir, club.Image())
-			if err := copyClubImage(config, club, imgName); err != nil {
+			hasImage, err := copyClubImage(config, club, imgName)
+			if err != nil {
 				return fmt.Errorf("copying club image for club %q: %w", club.Name, err)
 			}
 
-			*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical, LastMod: club.LastMod()})
+			entry := SitemapEntry{URL: tdata.Canonical, LastMod: club.LastMod()}
+			if hasImage {
+				entry.Image = createCanonicalURL(club.Image())
+			}
+			*sitemapUrls = append(*sitemapUrls, entry)
 		}
 	}
 	return nil
@@ -213,7 +232,7 @@ func renderTagPages(data *Data, config Config, cssFiles, otherJS []string, umami
 		if err := utils.ExecuteTemplate("tag.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering tag template %q: %w", tag.Name, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical})
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical, LastMod: tag.LastMod()})
 	}
 	return nil
 }
@@ -256,6 +275,43 @@ func renderSpecialPages(data *Data, config Config, cssFiles, otherJS []string, u
 type SitemapEntry struct {
 	URL     string
 	LastMod string
+	Image   string // optional image URL
+}
+
+type sitemapImage struct {
+	Loc string `xml:"image:loc"`
+}
+
+type sitemapURL struct {
+	Loc     string         `xml:"loc"`
+	LastMod string         `xml:"lastmod,omitempty"`
+	Images  []sitemapImage `xml:"image:image,omitempty"`
+}
+
+type sitemapURLSet struct {
+	XMLName    xml.Name     `xml:"urlset"`
+	Xmlns      string       `xml:"xmlns,attr"`
+	XmlnsImage string       `xml:"xmlns:image,attr"`
+	URLs       []sitemapURL `xml:"url"`
+}
+
+func buildSitemap(entries []SitemapEntry) ([]byte, error) {
+	set := sitemapURLSet{
+		Xmlns:      "http://www.sitemaps.org/schemas/sitemap/0.9",
+		XmlnsImage: "http://www.google.com/schemas/sitemap-image/1.1",
+	}
+	for _, e := range entries {
+		u := sitemapURL{Loc: e.URL, LastMod: e.LastMod}
+		if e.Image != "" {
+			u.Images = []sitemapImage{{Loc: e.Image}}
+		}
+		set.URLs = append(set.URLs, u)
+	}
+	body, err := xml.MarshalIndent(set, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	return append([]byte(xml.Header), append(body, '\n')...), nil
 }
 
 func createSiteFiles(data *Data, config Config, sitemapUrls []SitemapEntry) error {
@@ -282,18 +338,10 @@ func createSiteFiles(data *Data, config Config, sitemapUrls []SitemapEntry) erro
 
 	// create sitemap.xml
 	sitemapFile := filepath.Join(config.OutputDir, "sitemap.xml")
-	sitemapData := make([]byte, 0)
-	sitemapData = append(sitemapData, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")...)
-	sitemapData = append(sitemapData, []byte("<urlset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")...)
-	for _, entry := range sitemapUrls {
-		sitemapData = append(sitemapData, []byte("  <url>\n")...)
-		sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <loc>%s</loc>\n", entry.URL))...)
-		if entry.LastMod != "" {
-			sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <lastmod>%s</lastmod>\n", entry.LastMod))...)
-		}
-		sitemapData = append(sitemapData, []byte("  </url>\n")...)
+	sitemapData, err := buildSitemap(sitemapUrls)
+	if err != nil {
+		return fmt.Errorf("building sitemap: %w", err)
 	}
-	sitemapData = append(sitemapData, []byte("</urlset>\n")...)
 	if err := os.WriteFile(sitemapFile, sitemapData, 0644); err != nil {
 		return fmt.Errorf("writing sitemap file: %w", err)
 	}
@@ -309,27 +357,28 @@ func copyPlaceholderImage(config Config, targetPath string) error {
 	return nil
 }
 
-func copyClubImage(config Config, club *Club, targetPath string) error {
+// copyClubImage copies the club's image (or the placeholder) and reports whether a real image was used.
+func copyClubImage(config Config, club *Club, targetPath string) (bool, error) {
 	instagramProfile := club.InstagramProfile()
 	if instagramProfile != "" {
 		cachedImagName := filepath.Join(config.ImageDir, instagramProfile+".jpg")
 		if utils.FileExists(cachedImagName) {
 			if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
-				return fmt.Errorf("copying Instagram image for club %q: %w", club.Name, err)
+				return false, fmt.Errorf("copying Instagram image for club %q: %w", club.Name, err)
 			}
-			return nil
+			return true, nil
 		}
 	}
 
 	cachedImagName := filepath.Join(config.ImageDir, club.City.SanitizeName(), club.SanitizeName()+".jpg")
 	if utils.FileExists(cachedImagName) {
 		if err := utils.CopyFile(cachedImagName, targetPath); err != nil {
-			return fmt.Errorf("copying direct image for club %q: %w", club.Name, err)
+			return false, fmt.Errorf("copying direct image for club %q: %w", club.Name, err)
 		}
-		return nil
+		return true, nil
 	}
 
-	return copyPlaceholderImage(config, targetPath)
+	return false, copyPlaceholderImage(config, targetPath)
 }
 
 func Render(data *Data, cssFiles, jsFiles []string, config Config) error {

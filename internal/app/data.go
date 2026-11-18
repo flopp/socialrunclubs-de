@@ -116,15 +116,27 @@ func (c *Club) ParkrunsLink() string {
 	return fmt.Sprintf("https://parkruns.de/%s", matches[1])
 }
 
-// LastMod returns the latest LastMod of the city's clubs (ISO dates compare lexicographically).
-func (c *City) LastMod() string {
+// latestLastMod returns the latest LastMod of the given clubs (ISO dates compare lexicographically).
+func latestLastMod(clubs []*Club) string {
 	latest := ""
-	for _, club := range c.Clubs {
+	for _, club := range clubs {
 		if m := club.LastMod(); m > latest {
 			latest = m
 		}
 	}
 	return latest
+}
+
+func (c *City) LastMod() string {
+	return latestLastMod(c.Clubs)
+}
+
+func (t *Tag) LastMod() string {
+	return latestLastMod(t.Clubs)
+}
+
+func (d *Data) LastMod() string {
+	return latestLastMod(d.Clubs)
 }
 
 // LastMod returns the club's last update date, falling back to its added date.

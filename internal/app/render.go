@@ -102,7 +102,7 @@ func createTemplateDataWithEntities(config Config, data *Data, title, descriptio
 	return tdata
 }
 
-func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
+func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]SitemapEntry) error {
 	pages := []struct {
 		Title       string
 		Description string
@@ -173,20 +173,20 @@ func renderStaticPages(data *Data, config Config, cssFiles, otherJS []string, um
 		if err := utils.ExecuteTemplate(page.Template, filepath.Join(config.OutputDir, page.OutFile), tdata); err != nil {
 			return fmt.Errorf("rendering template %s: %w", page.Template, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical})
 	}
 
 	return nil
 }
 
-func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
+func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]SitemapEntry) error {
 	for _, city := range data.Cities {
 		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Run Clubs und Lauftreffs in %s", city.Name), city.MetaDescription(), createCanonicalURL(city.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, nil, nil, nil)
 		fileName := filepath.Join(config.OutputDir, city.Slug(), "index.html")
 		if err := utils.ExecuteTemplate("city.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering city template %q: %w", city.Name, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical, LastMod: city.LastMod()})
 
 		for _, club := range city.Clubs {
 			tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("%s - ein Run Club in %s", club.Name, city.Name), club.MetaDescription(), createCanonicalURL(club.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, city, club, nil, nil)
@@ -200,32 +200,32 @@ func renderCityPages(data *Data, config Config, cssFiles, otherJS []string, umam
 				return fmt.Errorf("copying club image for club %q: %w", club.Name, err)
 			}
 
-			*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
+			*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical, LastMod: club.LastMod()})
 		}
 	}
 	return nil
 }
 
-func renderTagPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
+func renderTagPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]SitemapEntry) error {
 	for _, tag := range data.Tags {
 		tdata := createTemplateDataWithEntities(config, data, fmt.Sprintf("Run Clubs und Lauftreffs in der Kategorie %s", tag.Name), fmt.Sprintf("Eine Übersicht über alle Run Clubs und Lauftreffs in der Kategorie %s.", tag.Name), createCanonicalURL(tag.Slug()), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, nil, nil, tag, nil)
 		fileName := filepath.Join(config.OutputDir, tag.Slug(), "index.html")
 		if err := utils.ExecuteTemplate("tag.html", fileName, tdata); err != nil {
 			return fmt.Errorf("rendering tag template %q: %w", tag.Name, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical})
 	}
 	return nil
 }
 
-func renderPostPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]string) error {
+func renderPostPages(data *Data, config Config, cssFiles, otherJS []string, umamiJS string, sitemapUrls *[]SitemapEntry) error {
 	for _, post := range data.Posts {
 		tdata := createTemplateDataWithEntities(config, data, post.Title, fmt.Sprintf("Artikel: %s", post.Title), createCanonicalURL(post.Slug), config.Google.SubmitUrl, config.Google.ReportUrl, cssFiles, otherJS, umamiJS, nil, nil, nil, post)
 		fileName := filepath.Join(config.OutputDir, post.Slug, "index.html")
 		if err := utils.ExecuteTemplate(post.TemplateFile, fileName, tdata); err != nil {
 			return fmt.Errorf("rendering post template %q: %w", post.Title, err)
 		}
-		*sitemapUrls = append(*sitemapUrls, tdata.Canonical)
+		*sitemapUrls = append(*sitemapUrls, SitemapEntry{URL: tdata.Canonical})
 	}
 	return nil
 }
@@ -253,7 +253,12 @@ func renderSpecialPages(data *Data, config Config, cssFiles, otherJS []string, u
 	return nil
 }
 
-func createSiteFiles(data *Data, config Config, sitemapUrls []string) error {
+type SitemapEntry struct {
+	URL     string
+	LastMod string
+}
+
+func createSiteFiles(data *Data, config Config, sitemapUrls []SitemapEntry) error {
 	// create htaccess with error page & redirects
 	htaccessFile := filepath.Join(config.OutputDir, ".htaccess")
 	htaccessData := make([]byte, 0)
@@ -280,9 +285,12 @@ func createSiteFiles(data *Data, config Config, sitemapUrls []string) error {
 	sitemapData := make([]byte, 0)
 	sitemapData = append(sitemapData, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")...)
 	sitemapData = append(sitemapData, []byte("<urlset xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")...)
-	for _, url := range sitemapUrls {
+	for _, entry := range sitemapUrls {
 		sitemapData = append(sitemapData, []byte("  <url>\n")...)
-		sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <loc>%s</loc>\n", url))...)
+		sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <loc>%s</loc>\n", entry.URL))...)
+		if entry.LastMod != "" {
+			sitemapData = append(sitemapData, []byte(fmt.Sprintf("    <lastmod>%s</lastmod>\n", entry.LastMod))...)
+		}
 		sitemapData = append(sitemapData, []byte("  </url>\n")...)
 	}
 	sitemapData = append(sitemapData, []byte("</urlset>\n")...)
@@ -336,7 +344,7 @@ func Render(data *Data, cssFiles, jsFiles []string, config Config) error {
 	}
 
 	// collect all canonical URLs for creating a sitemap
-	sitemapUrls := make([]string, 0)
+	sitemapUrls := make([]SitemapEntry, 0)
 
 	if err := renderStaticPages(data, config, cssFiles, otherJS, umamiJS, &sitemapUrls); err != nil {
 		return err

@@ -116,6 +116,25 @@ func (c *Club) ParkrunsLink() string {
 	return fmt.Sprintf("https://parkruns.de/%s", matches[1])
 }
 
+// LastMod returns the latest LastMod of the city's clubs (ISO dates compare lexicographically).
+func (c *City) LastMod() string {
+	latest := ""
+	for _, club := range c.Clubs {
+		if m := club.LastMod(); m > latest {
+			latest = m
+		}
+	}
+	return latest
+}
+
+// LastMod returns the club's last update date, falling back to its added date.
+func (c *Club) LastMod() string {
+	if c.UpdatedRaw != "" {
+		return c.UpdatedRaw
+	}
+	return c.AddedRaw
+}
+
 func (c *Club) MetaDescription() string {
 	maxLength := 160
 	desc := fmt.Sprintf("Informationen und Links zum Social Run Club '%s' in %s", c.Name, c.City.Name)

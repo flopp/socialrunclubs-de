@@ -139,12 +139,27 @@ func (d *Data) LastMod() string {
 	return latestLastMod(d.Clubs)
 }
 
-// LastMod returns the club's last update date, falling back to its added date.
-func (c *Club) LastMod() string {
-	if c.UpdatedRaw != "" {
-		return c.UpdatedRaw
+// validLastMod reports whether s is a plausible YYYY-MM-DD date (year >= 2000, not in the future).
+func validLastMod(s string) bool {
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return false
 	}
-	return c.AddedRaw
+	return t.Year() >= 2000 && !t.After(time.Now().AddDate(0, 0, 1))
+}
+
+// LastMod returns the club's last update date, falling back to its added date.
+// Invalid dates are skipped; an empty string is returned if none is valid.
+func (c *Club) LastMod() string {
+	for _, d := range []string{c.UpdatedRaw, c.AddedRaw} {
+		if d == "" {
+			continue
+		}
+		if validLastMod(d) {
+			return d
+		}
+	}
+	return ""
 }
 
 func (c *Club) MetaDescription() string {
@@ -409,6 +424,12 @@ func processClubsSheet(sheetName string, rows [][]string, data *Data) error {
 		if club.Name == "" {
 			log.Printf("CLUBS row %d: empty club name: %q", index+2, club.Name)
 			continue
+		}
+
+		for _, col := range []struct{ name, val string }{{"ADDED", club.AddedRaw}, {"UPDATED", club.UpdatedRaw}} {
+			if col.val != "" && !validLastMod(col.val) {
+				log.Printf("CLUBS row %d (%q): invalid %s date %q, expected YYYY-MM-DD", index+2, club.Name, col.name, col.val)
+			}
 		}
 		if len(club.Name) > 100 {
 			log.Printf("CLUBS row %d: club name too long: %q", index+2, club.Name)

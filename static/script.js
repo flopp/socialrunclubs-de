@@ -363,4 +363,31 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('umami.disabled');
         alert('Umami is now ENABLED in this browser.');
     }
+
+    // COUNTER
+    const counter = document.querySelector(".counter");
+    if (counter) {
+        fetch("/counter.php", { cache: "no-store" })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Besucherzähler konnte nicht geladen werden (HTTP ${response.status}).`);
+                }
+                return response.json();
+            })
+            .then((counts) => {
+                if (!Array.isArray(counts.dailyCounts) ||
+                        counts.dailyCounts.some((day) =>
+                        !day || !Number.isSafeInteger(day.count) || day.count < 0
+                )) {
+                    throw new Error("Der Besucherzähler hat eine ungültige Antwort geliefert.");
+                }
+
+                counter.textContent = counts.dailyCounts.map(({ count }) => count).join(" ");
+            })
+            .catch((error) => {
+                console.error(error);
+                counter.textContent = "nicht verfügbar";
+            });
+    }
+
 });

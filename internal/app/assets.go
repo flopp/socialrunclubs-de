@@ -107,6 +107,7 @@ func CopyAssets(config Config) ([]string, []string, error) {
 		"favicon.ico",
 		"favicon.svg",
 		"logo.svg",
+		"counter.php",
 	}
 	for _, icon := range icons {
 		if err := utils.CopyFile("static/"+icon, filepath.Join(config.OutputDir, icon)); err != nil {
